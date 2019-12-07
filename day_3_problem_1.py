@@ -142,7 +142,7 @@ def draw_wire_path(wire_path, pixels, color, _x, _y, img):
 
     x = _x
     y = _y
-    w = 1
+    w = 5
 
     draw = ImageDraw.Draw(img)
 
@@ -247,10 +247,10 @@ def add_coords_to_dict_and_check_crossed_paths(
             for i in range(distance):
                 c = Coords(x + i, y)
                 h = c.hash_coord()
-                if h in coord_dict:
+                if h in coord_dict and coord_dict[h][1] != id:
                     draw_circle(c, size, 'white', img)
                     d = manhattan_distance(c, center)
-                    if d < min_distance and d != 0 and coord_dict[h][1] != id:
+                    if d < min_distance and d != 0:
                         draw_circle(previous_min, size, 'white', img)
                         previous_min = c
                         min_distance = d
@@ -263,10 +263,10 @@ def add_coords_to_dict_and_check_crossed_paths(
             for i in range(distance):
                 c = Coords(x - i, y)
                 h = c.hash_coord()
-                if h in coord_dict:
+                if h in coord_dict and coord_dict[h][1] != id:
                     draw_circle(c, size, 'white', img)
                     d = manhattan_distance(c, center)
-                    if d < min_distance and d != 0 and coord_dict[h][1] != id:
+                    if d < min_distance and d != 0:
                         draw_circle(previous_min, size, 'white', img)
                         previous_min = c
                         min_distance = d
@@ -279,10 +279,10 @@ def add_coords_to_dict_and_check_crossed_paths(
             for i in range(distance):
                 c = Coords(x, y + i)
                 h = c.hash_coord()
-                if h in coord_dict:
+                if h in coord_dict and coord_dict[h][1] != id:
                     draw_circle(c, size, 'white', img)
                     d = manhattan_distance(c, center)
-                    if d < min_distance and d != 0 and coord_dict[h][1] != id:
+                    if d < min_distance and d != 0:
                         draw_circle(previous_min, size, 'white', img)
                         previous_min = c
                         min_distance = d
@@ -295,10 +295,10 @@ def add_coords_to_dict_and_check_crossed_paths(
             for i in range(distance):
                 c = Coords(x, y - i)
                 h = c.hash_coord()
-                if h in coord_dict:
+                if h in coord_dict and coord_dict[h][1] != id:
                     draw_circle(c, size, 'white', img)
                     d = manhattan_distance(c, center)
-                    if d < min_distance and d != 0 and coord_dict[h][1] != id:
+                    if d < min_distance and d != 0:
                         draw_circle(previous_min, size, 'white', img)
                         previous_min = c
                         min_distance = d
