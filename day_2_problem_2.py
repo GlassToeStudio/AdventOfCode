@@ -238,6 +238,7 @@ def solve_for_final_value(intcode, final_value):
                 return(output_answer(j, k))
 
 
-final_value = 19690720
-print(solve_for_final_value(intcode, final_value))
-# Your puzzle answer was 7870
+if __name__ == "__main__":
+    final_value = 19690720
+    print(solve_for_final_value(intcode, final_value))
+    # Your puzzle answer was 7870

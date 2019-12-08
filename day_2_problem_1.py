@@ -201,5 +201,7 @@ def run_intcode_program(pos_1, pos_2, intcode):
     return intcode[0]
 
 
-print(f"Final intcode at position 0: {run_intcode_program(12, 2, intcode)}")
-# Your puzzle answer was: 3267740
+if __name__ == "__main__":
+    print(
+        f"Final intcode at position 0: {run_intcode_program(12, 2, intcode)}")
+    # Your puzzle answer was: 3267740

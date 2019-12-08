@@ -87,9 +87,10 @@ def calculate_fuel_recursive(mass):
     return fuel
 
 
-total = 0
-for mass in modules:
-    total += calculate_fuel_recursive(mass)
+if __name__ == "__main__":
+    total = 0
+    for mass in modules:
+        total += calculate_fuel_recursive(mass)
 
-print(f"Total fuel required for problem 2: {total}")
+    print(f"Total fuel required for problem 2: {total}")
 # Your puzzle answer was 4898972
