@@ -18,40 +18,41 @@ crossing with itself.
 For example, if the first wire's path is R8,U5,L5,D3, then starting from the
 central port (o), it goes right 8, up 5, left 5, and finally down 3:
 
-...........
-...........
-...........
-....+----+.
-....|....|.
-....|....|.
-....|....|.
-.........|.
-.o-------+.
-...........
+    ...........
+    ...........
+    ...........
+    ....+----+.
+    ....|....|.
+    ....|....|.
+    ....|....|.
+    .........|.
+    .o-------+.
+    ...........
 
 Then, if the second wire's path is U7,R6,D4,L4, it goes up 7, right 6, down 4,
 and left 4:
 
-...........
-.+-----+...
-.|.....|...
-.|..+--X-+.
-.|..|..|.|.
-.|.-X--+.|.
-.|..|....|.
-.|.......|.
-.o-------+.
-...........
+    ...........
+    .+-----+...
+    .|.....|...
+    .|..+--X-+.
+    .|..|..|.|.
+    .|.-X--+.|.
+    .|..|....|.
+    .|.......|.
+    .o-------+.
+    ...........
 
 These wires cross at two locations (marked X), but the lower-left one is
 closer to the central port: its distance is 3 + 3 = 6.
 
 Here are a few more examples:
 
-R75,D30,R83,U83,L12,D49,R71,U7,L72
-U62,R66,U55,R34,D71,R55,D58,R83 = distance 159
-R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51
-U98,R91,D20,R16,D67,R40,U7,R15,U6,R7 = distance 135
+--  R75,D30,R83,U83,L12,D49,R71,U7,L72
+    U62,R66,U55,R34,D71,R55,D58,R83 = distance 159
+--  R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51
+    U98,R91,D20,R16,D67,R40,U7,R15,U6,R7 = distance 135
+
 What is the Manhattan distance from the central port to the closest
 intersection?
 '''
@@ -67,12 +68,6 @@ class Coords:
 
     def hash_coord(self):
         return f"{self.x};{self.y}"
-
-    def unhash_coord(self, hash):
-        s = hash.split(';')
-        self.x = int(s[0])
-        self.y = int(s[1])
-        return (self.x, self.y)
 
 
 wire_path_1 = [
@@ -315,71 +310,72 @@ def manhattan_distance(coord_1, coord_2):
     return (abs(coord_1.x - coord_2.x)) + (abs(coord_1.y - coord_2.y))
 
 
-# Get the horizontal and vertical boundries of the first wire path
-(wire_1_right_boundry,
-    wire_1_left_boundry) = get_horizontal_boundries(wire_path_1)
-(wire_2_right_boundry,
-    wire_2_left_boundry) = get_horizontal_boundries(wire_path_2)
+if __name__ == "__main__":
+    # Get the horizontal and vertical boundries of the first wire path
+    (wire_1_right_boundry,
+        wire_1_left_boundry) = get_horizontal_boundries(wire_path_1)
+    (wire_2_right_boundry,
+        wire_2_left_boundry) = get_horizontal_boundries(wire_path_2)
 
-# Get the horizontal and vertical boundries of the second wire path
-(wire_1_upper_boundry,
-    wire_1_lower_boundry) = get_vertical_boundries(wire_path_1)
-(wire_2_upper_boundry,
-    wire_2_lower_boundry) = get_vertical_boundries(wire_path_2)
+    # Get the horizontal and vertical boundries of the second wire path
+    (wire_1_upper_boundry,
+        wire_1_lower_boundry) = get_vertical_boundries(wire_path_1)
+    (wire_2_upper_boundry,
+        wire_2_lower_boundry) = get_vertical_boundries(wire_path_2)
 
-# calculate the outermost boundries of the two wire paths.
-# This will determine the size of the image we need to create.
-image_right_boundry = wire_1_right_boundry
-image_left_boundry = wire_1_left_boundry
-image_upper_boundry = wire_1_upper_boundry
-image_lower_boundry = wire_1_lower_boundry
+    # calculate the outermost boundries of the two wire paths.
+    # This will determine the size of the image we need to create.
+    image_right_boundry = wire_1_right_boundry
+    image_left_boundry = wire_1_left_boundry
+    image_upper_boundry = wire_1_upper_boundry
+    image_lower_boundry = wire_1_lower_boundry
 
-if(wire_2_right_boundry > image_right_boundry):
-    image_right_boundry = wire_2_right_boundry
-if(image_left_boundry > wire_2_left_boundry):
-    image_left_boundry = wire_2_left_boundry
-if(wire_2_upper_boundry > image_upper_boundry):
-    image_upper_boundry = wire_2_upper_boundry
-if(image_lower_boundry > wire_2_lower_boundry):
-    image_lower_boundry = wire_2_lower_boundry
+    if(wire_2_right_boundry > image_right_boundry):
+        image_right_boundry = wire_2_right_boundry
+    if(image_left_boundry > wire_2_left_boundry):
+        image_left_boundry = wire_2_left_boundry
+    if(wire_2_upper_boundry > image_upper_boundry):
+        image_upper_boundry = wire_2_upper_boundry
+    if(image_lower_boundry > wire_2_lower_boundry):
+        image_lower_boundry = wire_2_lower_boundry
 
-# Calculate image dimensions: widt and height.
-# Also calcualte the center, or origin of the wire paths.
-padding = 20
-width = abs(image_right_boundry) + abs(image_left_boundry) + padding
-height = abs(image_upper_boundry) + abs(image_lower_boundry) + padding
-center = Coords(abs(image_left_boundry) + padding/2,
-                abs(image_lower_boundry) + padding/2)
+    # Calculate image dimensions: widt and height.
+    # Also calcualte the center, or origin of the wire paths.
+    padding = 20
+    width = abs(image_right_boundry) + abs(image_left_boundry) + padding
+    height = abs(image_upper_boundry) + abs(image_lower_boundry) + padding
+    center = Coords(abs(image_left_boundry) + padding/2,
+                    abs(image_lower_boundry) + padding/2)
 
-# Create the image to the given dimensions and draw the two wire paths.
-img = Image.new('RGB', (width, height), color='black')
-pixels = img.load()
+    # Create the image to the given dimensions and draw the two wire paths.
+    img = Image.new('RGB', (width, height), color='black')
+    pixels = img.load()
 
-draw_wire_path(wire_path_2, pixels, (0, 255, 0), center.x, center.y, img)
+    draw_wire_path(wire_path_2, pixels, (0, 255, 0), center.x, center.y, img)
 
-draw_wire_path(wire_path_1, pixels, (255, 0, 0), center.x, center.y, img)
+    draw_wire_path(wire_path_1, pixels, (255, 0, 0), center.x, center.y, img)
 
-# Draw a circel at the origin of the paths
-draw_circle(center, 50, 'white', img)
+    # Draw a circel at the origin of the paths
+    draw_circle(center, 50, 'white', img)
 
-# To solve the puzzle, add the coordiantes of the first wire path
-# to a sudo-hash table.
-# Then loop the hash table and look for keys that exist.
-# Where they exist means the next wire path crosses the first.
-# Check the distance of that cross from the origin and note its
-# location, once the shortest distance is found, return it.
-# This will also add circles around each crosssed path, and a
-# special colored coricl for the closest crossing.
-coord_dict = add_coords_to_dict(wire_path_1, center.x, center.y, 1)
-min_distance = add_coords_to_dict_and_check_crossed_paths(
-                                                        wire_path_2,
-                                                        center.x,
-                                                        center.y,
-                                                        coord_dict,
-                                                        img,
-                                                        2)
+    # To solve the puzzle, add the coordiantes of the first wire path
+    # to a sudo-hash table.
+    # Then loop the hash table and look for keys that exist.
+    # Where they exist means the next wire path crosses the first.
+    # Check the distance of that cross from the origin and note its
+    # location, once the shortest distance is found, return it.
+    # This will also add circles around each crosssed path, and a
+    # special colored coricl for the closest crossing.
+    coord_dict = add_coords_to_dict(wire_path_1, center.x, center.y, 1)
+    min_distance = add_coords_to_dict_and_check_crossed_paths(
+                                                            wire_path_2,
+                                                            center.x,
+                                                            center.y,
+                                                            coord_dict,
+                                                            img,
+                                                            2)
 
-img.save('wires.png')
+    img.save('wire-diagram-closest-intersection.png')
 
-print(f"Minimun distance = {min_distance}")
-# Your puzzle answer was 245.
+    print(f"Minimun distance = {min_distance}")
+    # Your puzzle answer was 245.
