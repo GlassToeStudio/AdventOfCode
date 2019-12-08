@@ -103,15 +103,13 @@ intcode = [
 class Instruction:
     def __init__(self, fn, parameters):
         self.__num_parameters__ = parameters
-        self.steps = parameters + 1
+        self.steps = parameters + 1 if parameters > 0 else math.inf
         self.fn = fn
 
     def get_params(self, address, intcodes):
-        if self.__num_parameters__ < math.inf:
-            p = intcodes[address + 1:address + 1 + self.__num_parameters__]
-            print(p)
-        else:
-            p = 0
+        start = address + 1
+        end = start + self.__num_parameters__
+        p = intcodes[start:end]
         return p
 
     def execute(self, modes, params, intcodes):
@@ -192,7 +190,7 @@ add_instruction = Instruction(add_operation, 3)
 mult_instruction = Instruction(mul_operation, 3)
 input_instruction = Instruction(input_operation, 1)
 output_instruction = Instruction(output_operation, 1)
-halt_instruction = Instruction(halt_operation, math.inf)
+halt_instruction = Instruction(halt_operation, 0)
 
 instructions = {
     1: add_instruction,
