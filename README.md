@@ -35,7 +35,7 @@ Part 1: Draw the diagram and find the intersection closest to the origin. The lo
 Part 2: Here you had to find the shortest route tp the first intersection. Aka the sum of how far each wire traveled to an intersection. So a short route from wire path one might intersect wire path 2 on a much longer route. 
 Crewating a map of all intersections, with their wire routes distance made it quick an easy, if not dirty too. 
 
-# Day 4
+## Day 4
 
 Cracking a password.. or at least finding the possible solutions in a given range. 
 
@@ -43,7 +43,7 @@ Part 1: Not much here. There are some rules the password must follow, and a rang
 
 Part 2: Same problem but a few new rules, or modifications to the older rules. Pretty straight forward - with a brute force approach.
 
-# Day 5
+## Day 5
 
 **The intcode computer is back.**
 
