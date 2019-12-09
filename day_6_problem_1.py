@@ -87,11 +87,11 @@ orbit_map = [
 
 
 def map_direct_orbits(orbit_map):
+    ''' Return a dictionary of {orbited : [orbiters]} for the given input.'''
+
     map = {}
     for orbit in orbit_map:
-        data = orbit.split(')')
-        orbited = data[0]
-        orbiter = data[1]
+        orbited, orbiter = orbit.split(')')
         if orbited in map:
             map[orbited].append(orbiter)
         else:
@@ -101,6 +101,10 @@ def map_direct_orbits(orbit_map):
 
 
 def count_all_orbits(m, map, done, depth):
+    ''' Return the total direct and indirect orbits by recursively
+        searchiing each objects orbiters
+    '''
+    
     total = 0
     if m in map:
         if m not in done:
@@ -112,8 +116,7 @@ def count_all_orbits(m, map, done, depth):
     return total + depth
 
 
-def start():
-    print("\n")
+if __name__ == "__main__":
     total = 0
     done = {}
 
@@ -125,7 +128,4 @@ def start():
 
     print(f"The total number of direct and indirect orbits is {total}.")
 
-
-if __name__ == "__main__":
-    start()
-    # Your puzzle answer was 312697
+# Your puzzle answer was 312697
