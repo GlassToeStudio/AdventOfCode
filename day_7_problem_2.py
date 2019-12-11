@@ -86,6 +86,7 @@ class Instruction:
         self.__num_parameters__ = num_params
         self.operation_fn = operation_fn
         self.update_steps(num_params + 1 if num_params > 0 else math.inf)
+        self.r = 0
 
     def get_params(self, address, intcodes):
         start = address + 1
@@ -99,14 +100,6 @@ class Instruction:
     def execute(self, modes, params, intcodes, address):
         self.r = self.operation_fn(modes, params, intcodes, address)
         return self.r
-
-
-intcode = [
-    3, 8, 1001, 8, 10, 8, 105, 1, 0, 0, 21, 46, 67, 76, 101, 118, 199, 280, 361, 442, 99999, 3, 9, 1002, 9, 4, 9, 1001, 9, 2, 9, 102, 3, 9, 9, 101, 3, 9, 9, 102, 2, 9, 9, 4, 9, 99, 3, 9, 1001, 9, 3, 9, 102, 2, 9, 9, 1001, 9, 2, 9, 1002, 9, 3, 9, 4, 9, 99, 3, 9, 101, 3, 9, 9, 4, 9, 99, 3, 9, 1001, 9, 2, 9, 1002, 9, 5, 9, 101, 5, 9, 9, 1002, 9, 4, 9, 101, 5, 9, 9, 4, 9, 99, 3, 9, 102, 2, 9, 9, 1001, 9, 5, 9, 102, 2, 9, 9, 4, 9, 99, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 99, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99]
-
-index_map = [0]
-amp_output = [0]
-user_input = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 
 # intcode program methods
@@ -129,6 +122,7 @@ def get_modes(opcode):
 
 # Helper
 def get_param_by_mode(mode, val, codes):
+    # print(f"Val = {val}")
     return codes[val] if mode == '0' else val
 
 
@@ -141,7 +135,7 @@ def get_copy_of_program(intcode):
 
 def generate_sequences():
     sequence = []
-    for i, j, k, l, m in permu(range(5), 5):
+    for i, j, k, l, m in permu(range(5, 10), 5):
         sequence.append([i, j, k, l, m])
     return sequence
 
@@ -163,6 +157,7 @@ def add_operation(modes, params, codes, address):
     param_1 = get_param_by_mode(modes[2], params[0], codes)
     param_2 = get_param_by_mode(modes[1], params[1], codes)
     codes[params[2]] = param_1 + param_2
+    return 1, None
 
 
 def mul_operation(modes, params, codes, address):
@@ -181,17 +176,17 @@ def mul_operation(modes, params, codes, address):
     param_1 = get_param_by_mode(modes[2], params[0], codes)
     param_2 = get_param_by_mode(modes[1], params[1], codes)
     codes[params[2]] = param_1 * param_2
+    return 2, None
 
 
 def input_operation(modes, params, codes, address):
-    codes[params[0]] = user_input[index_map[0]]
-    if index_map[0] < len(user_input) - 1:
-        index_map[0] = index_map[0] + 1
+    codes[params[0]] = input_queue.pop()
+    return 3, None
 
 
 def output_operation(modes, params, codes, address):
-    # print(f"\t -- The value at position {params[0]} is {codes[params[0]]}")
-    amp_output[0] = codes[params[0]]
+    input_queue.append(codes[params[0]])
+    return 4, codes[params[0]]
 
 
 def jump_if_true_operation(modes, params, codes, address):
@@ -202,6 +197,7 @@ def jump_if_true_operation(modes, params, codes, address):
         instructions[5].update_steps(param_2 - address)
     else:
         instructions[5].update_steps(len(params) + 1)
+    return 5, None
 
 
 def jump_if_false_operation(modes, params, codes, address):
@@ -212,6 +208,7 @@ def jump_if_false_operation(modes, params, codes, address):
         instructions[6].update_steps(param_2 - address)
     else:
         instructions[6].update_steps(len(params) + 1)
+    return 6, None
 
 
 def less_than_operation(modes, params, codes, address):
@@ -221,6 +218,7 @@ def less_than_operation(modes, params, codes, address):
         codes[params[2]] = 1
     else:
         codes[params[2]] = 0
+    return 7, None
 
 
 def equals_operation(modes, params, codes, address):
@@ -230,10 +228,12 @@ def equals_operation(modes, params, codes, address):
         codes[params[2]] = 1
     else:
         codes[params[2]] = 0
+    return 8, None
 
 
 def halt_operation(modes, params, codes, address):
-    return
+    # print("Ending program")
+    return 99, None
 
 
 # Setup
@@ -259,17 +259,19 @@ instructions = {
     99: halt_instruction
 }
 
+intcode = [
+    3, 8, 1001, 8, 10, 8, 105, 1, 0, 0, 21, 46, 67, 76, 101, 118, 199, 280, 361, 442, 99999, 3, 9, 1002, 9, 4, 9, 1001, 9, 2, 9, 102, 3, 9, 9, 101, 3, 9, 9, 102, 2, 9, 9, 4, 9, 99, 3, 9, 1001, 9, 3, 9, 102, 2, 9, 9, 1001, 9, 2, 9, 1002, 9, 3, 9, 4, 9, 99, 3, 9, 101, 3, 9, 9, 4, 9, 99, 3, 9, 1001, 9, 2, 9, 1002, 9, 5, 9, 101, 5, 9, 9, 1002, 9, 4, 9, 101, 5, 9, 9, 4, 9, 99, 3, 9, 102, 2, 9, 9, 1001, 9, 5, 9, 102, 2, 9, 9, 4, 9, 99, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 1, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 99, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 102, 2, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 101, 1, 9, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 3, 9, 1001, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 3, 9, 1002, 9, 2, 9, 4, 9, 3, 9, 101, 2, 9, 9, 4, 9, 99]
+addresses = [0, 0, 0, 0, 0]
+input_queue = []
+
 
 # Main
-def run_intcode_program(intcode):
+def run_intcode_program(intcode, address, current_amp):
     ''' Run the intcode program ;)
 
     Args:
         intcode (int[]): the intcode program
     '''
-
-    result = 0
-    address = 0
 
     length = len(intcode)
     while (address < length):
@@ -277,44 +279,52 @@ def run_intcode_program(intcode):
         opcode = read_full_opcode(full_opcode)
         modes = get_modes(full_opcode)
         params = instructions[opcode].get_params(address, intcode)
-        instructions[opcode].execute(modes, params, intcode, address)
+        r, s = instructions[opcode].execute(modes, params, intcode, address)
         address += instructions[opcode].steps
+        if r == 4:
+            addresses[current_amp] = address
+            return r
+        if r == 99:
+            return r
+
+    return r
 
 
 def run_automated_program(highest_signal, num_amps):
-
     # For every permutation of phase setting sequences
     sequence = generate_sequences()
-  
     for i in range(len(sequence)):
-        index_map[0] = 0
-        amp_output[0] = 0
-        
-        user_input[0] = sequence[i][0]
-        user_input[1] = 0
-        user_input[2] = sequence[i][1]
-        user_input[4] = sequence[i][2]
-        user_input[6] = sequence[i][3]
-        user_input[8] = sequence[i][4]
-        print(f"Start {user_input}")
-        # For a total of 5 amplifiers
-        for n in range(num_amps):
-            run_intcode_program(get_copy_of_program(intcode))
-            if index_map[0] % 2 == 0:
-                user_input[index_map[0] + 1] = amp_output[0]
-                print(user_input)
+        programs = [get_copy_of_program(intcode) for x in range(5)]
+        input_queue.append(0)
+        done = False
 
-        if amp_output[0] > highest_signal:
-            highest_signal = amp_output[0]
+        for z in range(len(addresses)):
+            addresses[z] = 0
+
+        initialize_amps = True
+        while not done:
+            # For a total of 5 amplifiers
+            for n in range(num_amps):
+                if initialize_amps:
+                    input_queue.append(sequence[i][n])
+
+                r = run_intcode_program(programs[n], addresses[n], n)
+
+                if n == 4:
+                    initialize_amps = False
+
+                if r == 99:
+                    if input_queue[-1] > highest_signal:
+                        highest_signal = input_queue[-1]
+                    done = True
 
     return highest_signal
 
 
 if __name__ == "__main__":
-    highest_signal = 0
-    highest_signal = run_automated_program(highest_signal, 5)
+    highest_signal = run_automated_program(0, 5)
 
     print(
         "The highest signal that can " +
-        f"be sent to the thrusters is {highest_signal}."
+        f"be sent to the thrusters is {highest_signal}"
     )
