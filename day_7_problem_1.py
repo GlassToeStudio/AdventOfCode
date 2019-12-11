@@ -111,6 +111,30 @@ user_input = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 # intcode program methods
 def format_opcode(opcode):
+    ''' Return a string value of the opcode with parameter modes added:
+
+    Notes:
+        Opcodes are 5 digits, 2 for the opcode, and 3 for the parameter
+        modes. Leading zeros are omitted since these are integers.
+
+        For example, opcode 3 would be 00003
+        For example, opcode 103 would be 00103
+
+        ABCDE
+         1002
+
+        DE - two-digit opcode,      02 == opcode 2
+         C - mode of 1st parameter,  0 == position mode
+         B - mode of 2nd parameter,  1 == immediate mode
+         A - mode of 3rd parameter,  0 == default
+
+    Args:
+        opcode (int): The two digit opcode
+
+    Returns:
+        string: Value of the opcode with parameter modes added
+    '''
+
     sopcode = str(opcode)
     length = len(sopcode)
     for i in range(length, 5):
@@ -119,11 +143,59 @@ def format_opcode(opcode):
 
 
 def read_full_opcode(opcode):
+    ''' Return an integer value of the opcode:
+
+    Notes:
+        Opcodes are 5 digits, 2 for the opcode, and 3 for the parameter
+        modes. Leading zeros are omitted since these are integers.
+
+        For example, opcode 3 would be 00003
+        For example, opcode 103 would be 00103
+
+        ABCDE
+         1002
+
+        DE - two-digit opcode,      02 == opcode 2
+         C - mode of 1st parameter,  0 == position mode
+         B - mode of 2nd parameter,  1 == immediate mode
+         A - mode of 3rd parameter,  0 == default
+
+    Args:
+        opcode (int): The string version of the opcode with parameter modes
+
+    Returns:
+        int: opcode
+    '''
+
     opcode = int(opcode[-2:])
     return opcode
 
 
 def get_modes(opcode):
+    ''' Return an string value of the parameter modes:
+
+    Notes:
+        Opcodes are 5 digits, 2 for the opcode, and 3 for the parameter
+        modes. Leading zeros are omitted since these are integers.
+
+        For example, opcode 3 would be 00003
+        For example, opcode 103 would be 00103
+
+        ABCDE
+         1002
+
+        DE - two-digit opcode,      02 == opcode 2
+         C - mode of 1st parameter,  0 == position mode
+         B - mode of 2nd parameter,  1 == immediate mode
+         A - mode of 3rd parameter,  0 == default
+
+    Args:
+        opcode (int): The string version of the opcode with parameter modes
+
+    Returns:
+        string: parameter modes
+    '''
+
     return opcode[0:3]
 
 
@@ -133,6 +205,15 @@ def get_param_by_mode(mode, val, codes):
 
 
 def get_copy_of_program(intcode):
+    ''' Return a copy of the intcode.
+
+    Args:
+        intcode (int[]): The intcode program
+
+    Returns:
+        int[]: copy of intcode
+    '''
+
     program = []
     for i in intcode:
         program.append(i)
@@ -140,6 +221,12 @@ def get_copy_of_program(intcode):
 
 
 def generate_sequences():
+    ''' Return all permutations of the given range of numbers.
+
+    Returns:
+        int[[]]: Every permutation of the given range.
+    '''
+
     sequence = []
     for i, j, k, l, m in permu(range(5), 5):
         sequence.append([i, j, k, l, m])
@@ -148,16 +235,13 @@ def generate_sequences():
 
 # Operations:
 def add_operation(modes, params, codes, address):
-    ''' Adds the values found at the two intcode positions
+    ''' Adds together numbers read from two positions, params[1] and params[1]
+        and stores the result in a third position, params[2].
 
-        Args:
-            index_1 (int): Rhe location of the first opcode.
-            index_2 (int): The location of the second opcode.
-            codes (int[]): The array of opcodes.
-
-        Returns:
-            int: The sum of the values found at the given locations
-            in the codes array.
+    Args:
+        modes (int[]): The parameter modes for the instruction.
+        params (int[]): The parameters for the instruction.
+        codes (int[]): The intcode program
     '''
 
     param_1 = get_param_by_mode(modes[2], params[0], codes)
@@ -166,16 +250,13 @@ def add_operation(modes, params, codes, address):
 
 
 def mul_operation(modes, params, codes, address):
-    ''' Multiplies the values found at the two intcode positions
+    ''' Multiplies together numbers read from two positions, params[1] and
+    params[1] and stores the result in a third position, params[2].
 
     Args:
-        index_1 (int): Rhe location of the first opcode.
-        index_2 (int): The location of the second opcode.
-        codes (int[]): The array of opcodes.
-
-    Returns:
-        int: The product of the values found at the given locations
-        in the codes array.
+        modes (int[]): The parameter modes for the instruction.
+        params (int[]): The parameters for the instruction.
+        codes (int[]): The intcode program
     '''
 
     param_1 = get_param_by_mode(modes[2], params[0], codes)
@@ -195,6 +276,16 @@ def output_operation(modes, params, codes, address):
 
 
 def jump_if_true_operation(modes, params, codes, address):
+    ''' If the first parameter params[0] is non-zero, it sets the instruction
+    pointer to the value from the second parameter params[1]. Otherwise,
+    it does nothing.
+
+    Args:
+        modes (int[]): The parameter modes for the instruction.
+        params (int[]): The parameters for the instruction.
+        codes (int[]): The intcode program
+    '''
+
     param_1 = get_param_by_mode(modes[2], params[0], codes)
     param_2 = get_param_by_mode(modes[1], params[1], codes)
 
@@ -205,6 +296,16 @@ def jump_if_true_operation(modes, params, codes, address):
 
 
 def jump_if_false_operation(modes, params, codes, address):
+    ''' If the first parameter param[0] is zero, it sets the instruction
+    pointer to the value from the second parameter params[1].
+    Otherwise, it does nothing.
+
+    Args:
+        modes (int[]): The parameter modes for the instruction.
+        params (int[]): The parameters for the instruction.
+        codes (int[]): The intcode program
+    '''
+
     param_1 = get_param_by_mode(modes[2], params[0], codes)
     param_2 = get_param_by_mode(modes[1], params[1], codes)
 
@@ -215,8 +316,19 @@ def jump_if_false_operation(modes, params, codes, address):
 
 
 def less_than_operation(modes, params, codes, address):
+    ''' If the first parameter params[0] is less than the second
+    parameter params[1], it stores 1 in the position given by the third
+    parameter params[2]. Otherwise, it stores 0.
+
+    Args:
+        modes (int[]): The parameter modes for the instruction.
+        params (int[]): The parameters for the instruction.
+        codes (int[]): The intcode program
+    '''
+
     param_1 = get_param_by_mode(modes[2], params[0], codes)
     param_2 = get_param_by_mode(modes[1], params[1], codes)
+
     if param_1 < param_2:
         codes[params[2]] = 1
     else:
@@ -224,8 +336,19 @@ def less_than_operation(modes, params, codes, address):
 
 
 def equals_operation(modes, params, codes, address):
+    ''' If the first parameter params[0] is equal to the second
+    parameter params[1], it stores 1 in the position given by the third
+    parameter params[2]. Otherwise, it stores 0. 0.
+
+    Args:
+        modes (int[]): The parameter modes for the instruction.
+        params (int[]): The parameters for the instruction.
+        codes (int[]): The intcode program
+    '''
+
     param_1 = get_param_by_mode(modes[2], params[0], codes)
     param_2 = get_param_by_mode(modes[1], params[1], codes)
+
     if param_1 == param_2:
         codes[params[2]] = 1
     else:
@@ -233,7 +356,12 @@ def equals_operation(modes, params, codes, address):
 
 
 def halt_operation(modes, params, codes, address):
-    return
+    ''' Halts the program.
+
+    Returns:
+        int: opcode instruction 99
+    '''
+    return 99
 
 
 # Setup
@@ -271,8 +399,7 @@ def run_intcode_program(intcode):
     result = 0
     address = 0
 
-    length = len(intcode)
-    while (address < length):
+    while (address < len(intcode)):
         full_opcode = format_opcode(intcode[address])
         opcode = read_full_opcode(full_opcode)
         modes = get_modes(full_opcode)
@@ -282,27 +409,25 @@ def run_intcode_program(intcode):
 
 
 def run_automated_program(highest_signal, num_amps):
-
     # For every permutation of phase setting sequences
     sequence = generate_sequences()
-  
+
     for i in range(len(sequence)):
         index_map[0] = 0
         amp_output[0] = 0
-        
+
         user_input[0] = sequence[i][0]
         user_input[1] = 0
         user_input[2] = sequence[i][1]
         user_input[4] = sequence[i][2]
         user_input[6] = sequence[i][3]
         user_input[8] = sequence[i][4]
-        print(f"Start {user_input}")
+
         # For a total of 5 amplifiers
         for n in range(num_amps):
             run_intcode_program(get_copy_of_program(intcode))
             if index_map[0] % 2 == 0:
                 user_input[index_map[0] + 1] = amp_output[0]
-                print(user_input)
 
         if amp_output[0] > highest_signal:
             highest_signal = amp_output[0]
@@ -316,5 +441,5 @@ if __name__ == "__main__":
 
     print(
         "The highest signal that can " +
-        f"be sent to the thrusters is {highest_signal}."
+        f"be sent to the thrusters is {highest_signal}"
     )

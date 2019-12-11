@@ -264,6 +264,28 @@ def mul_operation(codes, params, modes, **kwargs):
     return 2
 
 
+def input_operation(codes, params, **kwargs):
+    ''' Prompt the user for input and store the value at the given location.
+
+    Notes:
+        Takes a single integer as input (from the console) and saves
+        it to the position given by its only parameter.
+        For example, the instruction 3,50
+        would take an input value and store it at address 50.
+
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+
+    Returns:
+        int: opcode instruction 1
+    '''
+
+    user_input = int(input("\t -- Please input a variable: "))
+    codes[params[0]] = user_input
+    return 3
+
+
 def automated_input_operation(codes, params, **kwargs):
     ''' Modify a value at location in the intcode program with the next
     available value in the input queue.
@@ -284,6 +306,28 @@ def automated_input_operation(codes, params, **kwargs):
 
     codes[params[0]] = input_queue.pop()
     return 3
+
+
+def output_operation(codes, params, **kwargs):
+    ''' Print to the console, teh output of the given instruction.
+
+    Notes:
+        Outputs the value of its only parameter. (to the console)
+        For example, the instruction 4,50 would output the value at
+        address 50.
+
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+
+    Prints to console:
+        the value at the given location
+
+    Returns:
+        int: opcode instruction 4
+    '''
+
+    print(f"\t -- The value at position {params[0]} is {codes[params[0]]}")
 
 
 def automated_output_operation(codes, params, **kwargs):
