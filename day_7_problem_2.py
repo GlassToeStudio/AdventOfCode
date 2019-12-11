@@ -1,80 +1,56 @@
-''' --- Day 7: Amplification Circuit ---
-Based on the navigational maps, you're going to need to send more power to
-your ship's thrusters to reach Santa in time. To do this, you'll need to
-configure a series of amplifiers already installed on the ship.
+''' --- Part Two ---
+It's no good - in this configuration, the amplifiers can't generate a large
+enough output signal to produce the thrust you'll need. The Elves quickly talk
+you through rewiring the amplifiers into a feedback loop:
 
-There are five amplifiers connected in series; each one receives an input
-signal and produces an output signal. They are connected such that the first
-amplifier's output leads to the second amplifier's input, the second
-amplifier's output leads to the third amplifier's input, and so on. The first
-amplifier's input value is 0, and the last amplifier's output leads to your
-ship's thrusters.
+      O-------O  O-------O  O-------O  O-------O  O-------O
+0 -+->| Amp A |->| Amp B |->| Amp C |->| Amp D |->| Amp E |-.
+   |  O-------O  O-------O  O-------O  O-------O  O-------O |
+   |                                                        |
+   '--------------------------------------------------------+
+                                                            |
+                                                            v
+                                                     (to thrusters)
 
-    O-------O  O-------O  O-------O  O-------O  O-------O
-0 ->| Amp A |->| Amp B |->| Amp C |->| Amp D |->| Amp E |-> (to thrusters)
-    O-------O  O-------O  O-------O  O-------O  O-------O
+Most of the amplifiers are connected as they were before; amplifier A's output
+is connected to amplifier B's input, and so on. However, the output from
+amplifier E is now connected into amplifier A's input. This creates the
+feedback loop: the signal will be sent through the amplifiers many times.
 
-The Elves have sent you some Amplifier Controller Software (your puzzle input),
-a program that should run on your existing Intcode computer. Each amplifier
-will need to run a copy of the program.
+In feedback loop mode, the amplifiers need totally different phase settings:
+integers from 5 to 9, again each used exactly once. These settings will cause
+the Amplifier Controller Software to repeatedly take input and produce output
+many times before halting. Provide each amplifier its phase setting at its
+first input instruction; all further input/output instructions are for signals.
 
-When a copy of the program starts running on an amplifier, it will first use
-an input instruction to ask the amplifier for its current phase setting (an
-integer from 0 to 4). Each phase setting is used exactly once, but the Elves
-can't remember which amplifier needs which phase setting.
+Don't restart the Amplifier Controller Software on any amplifier during this
+process. Each one should continue receiving and sending signals until it halts.
 
-The program will then call another input instruction to get the amplifier's
-input signal, compute the correct output signal, and supply it back to the
-amplifier with an output instruction. (If the amplifier has not yet received
-an input signal, it waits until one arrives.)
+All signals sent or received in this process will be between pairs of
+amplifiers except the very first signal and the very last signal. To start the
+process, a 0 signal is sent to amplifier A's input exactly once.
 
-Your job is to find the largest output signal that can be sent to the
-thrusters by trying every possible combination of phase settings on the
-amplifiers. Make sure that memory is not shared or reused between copies of
-the program.
-
-For example, suppose you want to try the phase setting sequence 3,1,2,4,0,
-which would mean setting amplifier A to phase setting 3, amplifier B to
-setting 1, C to 2, D to 4, and E to 0. Then, you could determine the output
-signal that gets sent from amplifier E to the thrusters with the following
-steps:
-
---  Start the copy of the amplifier controller software that will run on
-    amplifier A. At its first input instruction, provide it the amplifier's
-    phase setting, 3. At its second input instruction, provide it the input
-    signal, 0. After some calculations, it will use an output instruction to
-    indicate the amplifier's output signal.
---  Start the software for amplifier B. Provide it the phase setting (1) and
-    then whatever output signal was produced from amplifier A. It will then
-    produce a new output signal destined for amplifier C.
---  Start the software for amplifier C, provide the phase setting (2) and
-    the value from amplifier B, then collect its output signal.
---  Run amplifier D's software, provide the phase setting (4) and input value,
-    and collect its output signal.
---  Run amplifier E's software, provide the phase setting (0) and input value,
-    and collect its output signal.
-
-The final output signal from amplifier E would be sent to the thrusters.
-However, this phase setting sequence may not have been the best one; another
-sequence might have sent a higher signal to the thrusters.
+Eventually, the software on the amplifiers will halt after they have processed
+the final loop. When this happens, the last output signal from amplifier E is
+sent to the thrusters. Your job is to find the largest output signal that can
+be sent to the thrusters using the new phase settings and feedback loop
+arrangement.
 
 Here are some example programs:
 
---  Max thruster signal 43210 (from phase setting sequence 4,3,2,1,0):
+--  Max thruster signal 139629729 (from phase setting sequence 9,8,7,6,5):
 
-    3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0
-    Max thruster signal 54321 (from phase setting sequence 0,1,2,3,4):
+    3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,
+    27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5
 
-    3,23,3,24,1002,24,10,24,1002,23,-1,23,
-    101,5,23,23,1,24,23,23,4,23,99,0,0
+--  Max thruster signal 18216 (from phase setting sequence 9,7,8,5,6):
 
---  Max thruster signal 65210 (from phase setting sequence 1,0,4,3,2):
+    3,52,1001,52,-5,52,3,53,1,52,56,54,1007,54,5,55,1005,55,26,1001,54,
+    -5,54,1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4,
+    53,1001,56,-1,56,1005,56,6,99,0,0,0,0,10
 
-    3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,
-    1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0
-
-Try every combination of phase settings on the amplifiers. What is the highest
-signal that can be sent to the thrusters?
+Try every combination of the new phase settings on the amplifier feedback
+loop. What is the highest signal that can be sent to the thrusters?
 '''
 
 import math
@@ -88,7 +64,7 @@ class Instruction:
         self.update_steps(num_params + 1 if num_params > 0 else math.inf)
         self.r = 0
 
-    def get_params(self, address, intcodes):
+    def get_params(self, intcodes, address):
         start = address + 1
         end = start + self.__num_parameters__
         p = intcodes[start:end]
@@ -97,13 +73,38 @@ class Instruction:
     def update_steps(self, steps):
         self.steps = steps
 
-    def execute(self, modes, params, intcodes, address):
-        self.r = self.operation_fn(modes, params, intcodes, address)
+    def execute(self, intcodes=[],  params=[], modes=[],  address=0):
+        self.r = self.operation_fn(
+            codes=intcodes, params=params, modes=modes, address=address)
         return self.r
 
 
-# intcode program methods
+# intcode program helper methods
 def format_opcode(opcode):
+    ''' Return a string value of the opcode with parameter modes added:
+
+    Notes:
+        Opcodes are 5 digits, 2 for the opcode, and 3 for the parameter
+        modes. Leading zeros are omitted since these are integers.
+
+        For example, opcode 3 would be 00003
+        For example, opcode 103 would be 00103
+
+        ABCDE
+         1002
+
+        DE - two-digit opcode,      02 == opcode 2
+         C - mode of 1st parameter,  0 == position mode
+         B - mode of 2nd parameter,  1 == immediate mode
+         A - mode of 3rd parameter,  0 == default
+
+    Args:
+        opcode (int): The two digit opcode
+
+    Returns:
+        string: Value of the opcode with parameter modes added
+    '''
+
     sopcode = str(opcode)
     length = len(sopcode)
     for i in range(length, 5):
@@ -112,135 +113,302 @@ def format_opcode(opcode):
 
 
 def read_full_opcode(opcode):
+    ''' Return an integer value of the opcode:
+
+    Notes:
+        Opcodes are 5 digits, 2 for the opcode, and 3 for the parameter
+        modes. Leading zeros are omitted since these are integers.
+
+        For example, opcode 3 would be 00003
+        For example, opcode 103 would be 00103
+
+        ABCDE
+         1002
+
+        DE - two-digit opcode,      02 == opcode 2
+         C - mode of 1st parameter,  0 == position mode
+         B - mode of 2nd parameter,  1 == immediate mode
+         A - mode of 3rd parameter,  0 == default
+
+    Args:
+        opcode (int): The string version of the opcode with parameter modes
+
+    Returns:
+        int: opcode
+    '''
+
     opcode = int(opcode[-2:])
     return opcode
 
 
 def get_modes(opcode):
+    ''' Return an string value of the parameter modes:
+
+    Notes:
+        Opcodes are 5 digits, 2 for the opcode, and 3 for the parameter
+        modes. Leading zeros are omitted since these are integers.
+
+        For example, opcode 3 would be 00003
+        For example, opcode 103 would be 00103
+
+        ABCDE
+         1002
+
+        DE - two-digit opcode,      02 == opcode 2
+         C - mode of 1st parameter,  0 == position mode
+         B - mode of 2nd parameter,  1 == immediate mode
+         A - mode of 3rd parameter,  0 == default
+
+    Args:
+        opcode (int): The string version of the opcode with parameter modes
+
+    Returns:
+        string: parameter modes
+    '''
+
     return opcode[0:3]
 
 
-# Helper
-def get_param_by_mode(mode, val, codes):
-    # print(f"Val = {val}")
-    return codes[val] if mode == '0' else val
+# Main helper methods
+def get_param_by_mode(modes, params, codes):
+    ''' Return the values of the given parameters based on their position mode.
+
+    Notes:
+        0, position mode, which causes the parameter to be interpreted as a
+        position - if the parameter is 50, its value is the value stored
+        at address 50 in memory.
+
+        1, immediate mode. In immediate mode, a parameter is interpreted
+        as a value - if the parameter is 50, its value is simply 50.
+
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+        modes (int[]): The parameter modes for the instruction
+
+    Returns:
+        tuple<int>: param_1, param_2
+    '''
+
+    param_1 = codes[params[0]] if modes[2] == '0' else params[0]
+    param_2 = codes[params[1]] if modes[1] == '0' else params[1]
+    return param_1, param_2
 
 
 def get_copy_of_program(intcode):
+    ''' Return a copy of the intcode.
+
+    Args:
+        intcode (int[]): The intcode program
+
+    Returns:
+        int[]: copy of intcode
+    '''
+
     program = []
     for i in intcode:
         program.append(i)
     return program
 
 
-def generate_sequences():
+def generate_sequences(start, end):
+    ''' Return all permutations of the given range of numbers.
+
+    Args:
+        start (int): Beginning of the range.
+        end (int): End of the range.
+
+    Returns:
+        int[[]]: Every permutation of the given range.
+    '''
     sequence = []
-    for i, j, k, l, m in permu(range(5, 10), 5):
+    for i, j, k, l, m in permu(range(start, end), 5):
         sequence.append([i, j, k, l, m])
     return sequence
 
 
 # Operations:
-def add_operation(modes, params, codes, address):
-    ''' Adds the values found at the two intcode positions
-
-        Args:
-            index_1 (int): Rhe location of the first opcode.
-            index_2 (int): The location of the second opcode.
-            codes (int[]): The array of opcodes.
-
-        Returns:
-            int: The sum of the values found at the given locations
-            in the codes array.
-    '''
-
-    param_1 = get_param_by_mode(modes[2], params[0], codes)
-    param_2 = get_param_by_mode(modes[1], params[1], codes)
-    codes[params[2]] = param_1 + param_2
-    return 1, None
-
-
-def mul_operation(modes, params, codes, address):
-    ''' Multiplies the values found at the two intcode positions
+def add_operation(codes, params, modes, **kwargs):
+    ''' Adds together numbers read from two positions, params[1] and params[1]
+        and stores the result in a third position, params[2].
 
     Args:
-        index_1 (int): Rhe location of the first opcode.
-        index_2 (int): The location of the second opcode.
-        codes (int[]): The array of opcodes.
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+        modes (int[]): The parameter modes for the instruction.
 
     Returns:
-        int: The product of the values found at the given locations
-        in the codes array.
+        int: opcode instruction 1
     '''
 
-    param_1 = get_param_by_mode(modes[2], params[0], codes)
-    param_2 = get_param_by_mode(modes[1], params[1], codes)
+    param_1, param_2 = get_param_by_mode(modes, params, codes)
+    codes[params[2]] = param_1 + param_2
+    return 1
+
+
+def mul_operation(codes, params, modes, **kwargs):
+    ''' Multiplies together numbers read from two positions, params[1] and
+    params[1] and stores the result in a third position, params[2].
+
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+        modes (int[]): The parameter modes for the instruction.
+
+    Returns:
+        int: opcode instruction 2
+    '''
+
+    param_1, param_2 = get_param_by_mode(modes, params, codes)
     codes[params[2]] = param_1 * param_2
-    return 2, None
+    return 2
 
 
-def input_operation(modes, params, codes, address):
+def automated_input_operation(codes, params, **kwargs):
+    ''' Modify a value at location in the intcode program with the next
+    available value in the input queue.
+
+    Notes:
+        Takes a single integer as input (from the input queue) and saves
+        it to the position given by its only parameter.
+        For example, the instruction 3,50
+        would take an input value and store it at address 50.
+
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+
+    Returns:
+        int: opcode instruction 3
+    '''
+
     codes[params[0]] = input_queue.pop()
-    return 3, None
+    return 3
 
 
-def output_operation(modes, params, codes, address):
+def automated_output_operation(codes, params, **kwargs):
+    ''' Add the value from the intcode program at location params[0] to the
+    input_queue
+
+    Notes:
+        Outputs the value of its only parameter. (to the input queue)
+        For example, the instruction 4,50 would output the value at
+        address 50.
+
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+
+    Returns:
+        int: opcode instruction 4
+    '''
     input_queue.append(codes[params[0]])
-    return 4, codes[params[0]]
+    return 4
 
 
-def jump_if_true_operation(modes, params, codes, address):
-    param_1 = get_param_by_mode(modes[2], params[0], codes)
-    param_2 = get_param_by_mode(modes[1], params[1], codes)
+def jump_if_true_operation(codes, params, modes, address):
+    ''' If the first parameter params[0] is non-zero, it sets the instruction
+    pointer to the value from the second parameter params[1]. Otherwise,
+    it does nothing.
 
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+        modes (int[]): The parameter modes for the instruction.
+
+    Returns:
+        int: opcode instruction 5
+    '''
+
+    param_1, param_2 = get_param_by_mode(modes, params, codes)
     if param_1 != 0:
         instructions[5].update_steps(param_2 - address)
     else:
         instructions[5].update_steps(len(params) + 1)
-    return 5, None
+    return 5
 
 
-def jump_if_false_operation(modes, params, codes, address):
-    param_1 = get_param_by_mode(modes[2], params[0], codes)
-    param_2 = get_param_by_mode(modes[1], params[1], codes)
+def jump_if_false_operation(codes, params, modes, address):
+    ''' If the first parameter param[0] is zero, it sets the instruction
+    pointer to the value from the second parameter params[1].
+    Otherwise, it does nothing.
 
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+        modes (int[]): The parameter modes for the instruction.
+
+    Returns:
+        int: opcode instruction 6
+    '''
+
+    param_1, param_2 = get_param_by_mode(modes, params, codes)
     if param_1 == 0:
         instructions[6].update_steps(param_2 - address)
     else:
         instructions[6].update_steps(len(params) + 1)
-    return 6, None
+    return 6
 
 
-def less_than_operation(modes, params, codes, address):
-    param_1 = get_param_by_mode(modes[2], params[0], codes)
-    param_2 = get_param_by_mode(modes[1], params[1], codes)
+def less_than_operation(codes, params, modes, **kwargs):
+    ''' If the first parameter params[0] is less than the second
+    parameter params[1], it stores 1 in the position given by the third
+    parameter params[2]. Otherwise, it stores 0.
+
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+        modes (int[]): The parameter modes for the instruction.
+
+    Returns:
+        int: opcode instruction 7
+    '''
+
+    param_1, param_2 = get_param_by_mode(modes, params, codes)
     if param_1 < param_2:
         codes[params[2]] = 1
     else:
         codes[params[2]] = 0
-    return 7, None
+    return 7
 
 
-def equals_operation(modes, params, codes, address):
-    param_1 = get_param_by_mode(modes[2], params[0], codes)
-    param_2 = get_param_by_mode(modes[1], params[1], codes)
+def equals_operation(codes, params, modes, **kwargs):
+    ''' If the first parameter params[0] is equal to the second
+    parameter params[1], it stores 1 in the position given by the third
+    parameter params[2]. Otherwise, it stores 0. 0.
+
+    Args:
+        codes (int[]): The intcode program
+        params (int[]): The parameters for the instruction.
+        modes (int[]): The parameter modes for the instruction.
+
+    Returns:
+        int: opcode instruction 8
+    '''
+
+    param_1, param_2 = get_param_by_mode(modes, params, codes)
     if param_1 == param_2:
         codes[params[2]] = 1
     else:
         codes[params[2]] = 0
-    return 8, None
+    return 8
 
 
-def halt_operation(modes, params, codes, address):
-    # print("Ending program")
-    return 99, None
+def halt_operation(**kwargs):
+    ''' Halts the program.
+
+    Returns:
+        int: opcode instruction 99
+    '''
+
+    return 99
 
 
 # Setup
 add_instruction = Instruction(add_operation, 3)
 mult_instruction = Instruction(mul_operation, 3)
-input_instruction = Instruction(input_operation, 1)
-output_instruction = Instruction(output_operation, 1)
+input_instruction = Instruction(automated_input_operation, 1)
+output_instruction = Instruction(automated_output_operation, 1)
 jump_if_true_instruction = Instruction(jump_if_true_operation, 2)
 jump_if_false_instruction = Instruction(jump_if_false_operation, 2)
 less_than_instruction = Instruction(less_than_operation, 3)
@@ -271,60 +439,61 @@ def run_intcode_program(intcode, address, current_amp):
 
     Args:
         intcode (int[]): the intcode program
+        address (int): the starting address for the program
+        current_amp (int): Of many, the current program to run
+
+    Returns:
+        int: opcode 4 if output received, 99 if halt
+
     '''
 
-    length = len(intcode)
-    while (address < length):
+    while (address < len(intcode)):
         full_opcode = format_opcode(intcode[address])
         opcode = read_full_opcode(full_opcode)
         modes = get_modes(full_opcode)
-        params = instructions[opcode].get_params(address, intcode)
-        r, s = instructions[opcode].execute(modes, params, intcode, address)
+        params = instructions[opcode].get_params(intcode, address)
+        r = instructions[opcode].execute(intcode, params, modes, address)
         address += instructions[opcode].steps
         if r == 4:
             addresses[current_amp] = address
             return r
         if r == 99:
             return r
-
     return r
 
 
-def run_automated_program(highest_signal, num_amps):
+def run_automated_program(num_amps, highest_signal):
     # For every permutation of phase setting sequences
-    sequence = generate_sequences()
+    sequence = generate_sequences(5, 10)
     for i in range(len(sequence)):
         programs = [get_copy_of_program(intcode) for x in range(5)]
         input_queue.append(0)
         done = False
-
         for z in range(len(addresses)):
             addresses[z] = 0
-
         initialize_amps = True
+        # Loop until the final amp halts
         while not done:
             # For a total of 5 amplifiers
-            for n in range(num_amps):
+            for amp in range(num_amps):
                 if initialize_amps:
-                    input_queue.append(sequence[i][n])
-
-                r = run_intcode_program(programs[n], addresses[n], n)
-
-                if n == 4:
-                    initialize_amps = False
-
-                if r == 99:
-                    if input_queue[-1] > highest_signal:
-                        highest_signal = input_queue[-1]
+                    input_queue.append(sequence[i][amp])
+                result_code = run_intcode_program(
+                    programs[amp],
+                    addresses[amp],
+                    amp)
+                if result_code == 99:
+                    highest_signal = max(highest_signal, input_queue[-1])
                     done = True
-
+            initialize_amps = False
     return highest_signal
 
 
 if __name__ == "__main__":
-    highest_signal = run_automated_program(0, 5)
+    highest_signal = run_automated_program(5, 0)
 
     print(
         "The highest signal that can " +
         f"be sent to the thrusters is {highest_signal}"
     )
+# Your puzzle answer was 17279674
