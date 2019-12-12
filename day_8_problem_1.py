@@ -43,22 +43,18 @@ what is the number of 1 digits multiplied by the number of 2 digits?
 import math
 from collections import Counter
 
-# Just too much data to keep in this .py file :(
-f = open("Data/day-8.txt", "r")
-image_data = f.read()
-
 
 def process_data(image_data, width, height):
-    data = []
+    processed_data = []
     start = 0
     length = width * height
     num_layers = int(len(image_data) / length)
     end = length
     for i in range(num_layers):
-        data.append([int(x) for x in image_data[start:end]])
+        processed_data.append([int(x) for x in image_data[start:end]])
         start = end
         end += length
-    return data
+    return processed_data
 
 
 def find_least(arr, num):
@@ -73,8 +69,8 @@ def find_least(arr, num):
 
 
 def count_occurences(arr, num):
-    c = Counter(arr)
-    return c[num]
+    count = Counter(arr)
+    return count[num]
 
 
 def get_answer(arr, num):
@@ -85,9 +81,13 @@ def get_answer(arr, num):
 
 
 if __name__ == "__main__":
-    layer_data = process_data(image_data, 25, 6)
+    width = 25
+    height = 6
+    # Just too much data to keep in this .py file :(
+    with open("Data/day-8.txt", "r") as in_file:
+        input_data = in_file.read()
+    layer_data = process_data(input_data, width, height)
     print(
         "The number of 1s multiplied by the nuumber of 2s"
         f" on the layer with the least 0s is : {get_answer(layer_data, 0)}")
-
 # Your puzzle answer was 2016
