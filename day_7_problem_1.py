@@ -443,3 +443,4 @@ if __name__ == "__main__":
         "The highest signal that can " +
         f"be sent to the thrusters is {highest_signal}"
     )
+# Your puzzle answer was 87138
