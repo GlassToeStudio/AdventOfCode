@@ -478,7 +478,7 @@ input_queue = []
 
 
 # Main
-def run_intcode_program(intcode, address, current_amp):
+def run_intcode_program(intcode, current_address, current_amp):
     ''' Run the intcode program ;)
 
     Args:
@@ -491,15 +491,20 @@ def run_intcode_program(intcode, address, current_amp):
 
     '''
 
-    while (address < len(intcode)):
-        full_opcode = format_opcode(intcode[address])
+    while (current_address < len(intcode)):
+        full_opcode = format_opcode(intcode[current_address])
         opcode = read_full_opcode(full_opcode)
         modes = get_modes(full_opcode)
-        params = instructions[opcode].get_params(intcode, address)
-        r = instructions[opcode].execute(intcode, params, modes, address)
-        address += instructions[opcode].steps
+        params = instructions[opcode].get_params(intcode, current_address)
+        r = instructions[opcode].execute(
+            intcode,
+            params,
+            modes,
+            current_address
+            )
+        current_address += instructions[opcode].steps
         if r == 4:
-            addresses[current_amp] = address
+            addresses[current_amp] = current_address
             return r
         if r == 99:
             return r
@@ -508,27 +513,27 @@ def run_intcode_program(intcode, address, current_amp):
 
 def run_automated_program(num_amps, highest_signal):
     # For every permutation of phase setting sequences
-    sequence = generate_sequences(5, 10)
-    for i in range(len(sequence)):
+    sequences = generate_sequences(5, 10)
+    for seq in range(len(sequences)):
         programs = [get_copy_of_program(intcode) for x in range(5)]
         input_queue.append(0)
-        done = False
-        for z in range(len(addresses)):
-            addresses[z] = 0
+        halted = False
+        for address in range(len(addresses)):
+            addresses[address] = 0
         initialize_amps = True
         # Loop until the final amp halts
-        while not done:
+        while not halted:
             # For a total of 5 amplifiers
             for amp in range(num_amps):
                 if initialize_amps:
-                    input_queue.append(sequence[i][amp])
+                    input_queue.append(sequences[seq][amp])
                 result_code = run_intcode_program(
                     programs[amp],
                     addresses[amp],
                     amp)
                 if result_code == 99:
                     highest_signal = max(highest_signal, input_queue[-1])
-                    done = True
+                    halted = True
             initialize_amps = False
     return highest_signal
 
