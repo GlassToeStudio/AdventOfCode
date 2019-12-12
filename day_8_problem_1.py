@@ -1,48 +1,93 @@
+''' --- Day 8: Space Image Format ---
+The Elves' spirits are lifted when they realize you have an opportunity to
+reboot one of their Mars rovers, and so they are curious if you would spend a
+brief sojourn on Mars. You land your ship near the rover.
+
+When you reach the rover, you discover that it's already in the process of
+rebooting! It's just waiting for someone to enter a BIOS password. The Elf
+responsible for the rover takes a picture of the password (your puzzle input)
+and sends it to you via the Digital Sending Network.
+
+Unfortunately, images sent via the Digital Sending Network aren't encoded with
+any normal encoding; instead, they're encoded in a special Space Image Format.
+None of the Elves seem to remember why this is the case. They send you the
+instructions to decode it.
+
+Images are sent as a series of digits that each represent the color of a
+single pixel. The digits fill each row of the image left-to-right, then move
+downward to the next row, filling rows top-to-bottom until every pixel of the
+image is filled.
+
+Each image actually consists of a series of identically-sized layers that are
+filled in this way. So, the first digit corresponds to the top-left pixel of
+the first layer, the second digit corresponds to the pixel to the right of
+that on the same layer, and so on until the last digit, which corresponds to
+the bottom-right pixel of the last layer.
+
+For example, given an image 3 pixels wide and 2 pixels tall, the image data
+123456789012 corresponds to the following image layers:
+
+    Layer 1: 123
+             456
+
+    Layer 2: 789
+             012
+
+The image you received is 25 pixels wide and 6 pixels tall.
+
+To make sure the image wasn't corrupted during transmission, the Elves would
+like you to find the layer that contains the fewest 0 digits. On that layer,
+what is the number of 1 digits multiplied by the number of 2 digits?
+'''
+
 import math
 from collections import Counter
 
+# Just too much data to keep in this .py file :(
 f = open("Data/day-8.txt", "r")
-a = f.read()
+image_data = f.read()
 
 
-def B(c, d, e):
-    f = []
-    g = 0
-    h = d * e
-    i = int(len(c) / h)
-    j = h
-    for k in range(i):
-        f.append([int(x) for x in c[g:j]])
-        g = j
-        j += h
-    return f
+def process_data(image_data, width, height):
+    data = []
+    start = 0
+    length = width * height
+    num_layers = int(len(image_data) / length)
+    end = length
+    for i in range(num_layers):
+        data.append([int(x) for x in image_data[start:end]])
+        start = end
+        end += length
+    return data
 
 
-def L(m, n):
-    o = 0
-    p = math.inf
-    for q in range(len(m)):
-        c = R(m[q], n)
-        if c < p:
-            o = q
-            p = c
-    return o
+def find_least(arr, num):
+    index = 0
+    least = math.inf
+    for i in range(len(arr)):
+        c = count_occurences(arr[i], num)
+        if c < least:
+            index = i
+            least = c
+    return index
 
 
-def R(s, t):
-    u = Counter(s)
-    return u[t]
+def count_occurences(arr, num):
+    c = Counter(arr)
+    return c[num]
 
 
-def V(w, x):
-    y = L(w, x)
-    z = R(w[y], 1)
-    aa = R(w[y], 2)
-    return z * aa
+def get_answer(arr, num):
+    index = find_least(arr, num)
+    ones = count_occurences(arr[index], 1)
+    twos = count_occurences(arr[index], 2)
+    return ones * twos
 
 
 if __name__ == "__main__":
-    ab = B(a, 25, 6)
-    print(V(ab, 0))
+    layer_data = process_data(image_data, 25, 6)
+    print(
+        "The number of 1s multiplied by the nuumber of 2s"
+        f" on the layer with the least 0s is : {get_answer(layer_data, 0)}")
 
 # Your puzzle answer was 2016
