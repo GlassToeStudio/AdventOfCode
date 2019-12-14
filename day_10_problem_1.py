@@ -283,3 +283,4 @@ if __name__ == "__main__":
     print_map(total_seen, ', ')
     print_map(space_map, '  ')
     print("Max value is:", max_check, "Coords are:", coords)
+# Your puzzle answer was 340
