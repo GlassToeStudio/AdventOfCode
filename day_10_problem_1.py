@@ -128,10 +128,16 @@ can be detected from that location?
 import math
 from collections import Counter
 
+GREEN = "\033[0;32;40m"
+YELLOW = "\033[0;33;40m"
+BLUE = "\033[0;34;40m"
+RED = "\033[0;31;40m"
+END = "\033[0m"
+
 data_input = ".#..#.....#####....#...##"
 data_input = "#.#...#.#..###....#..#....#...##.#.#.#.#....#.#.#..##..###.#..#...##....##....##......#....####.###."
 data_input = ".#..#..#######.###.#....###.#...###.##.###.##.#.#.....###..#..#.#..#.##..#.#.###.##...##.#.....#.#.."
-#data_input = ".#....#.###.........#..##.###.#.....##..............##.......#.#...#...#..#....#.....#....##..##.......#..........###..#.......#....####......#..#.#........#......................##..#....#...##..#...#..#...#....#....#..#.....#.#......#..#...#........#.#....#.#...##.........#...#.......#...##.#.#...#.......#....#........#.........##........#....#..........#.......#....##..........##.....#....#.........#.......#..##......#..#.#.#...#.................#.##.........#...#.#.....#........#....#.#.#.#......#.#...##...#.........##....#.#....#..#.....#.#......##.##...#.......#..#..##.....#..#.........#...##.....#..#.##.#...#.#.#.#.#.#.........#..#...#.##....#.....#......##..#.#..#....#....#####...........#...##...#.....#.......#....#.#.##......#..#..#.#.#....##..#......###.................#..#.#.#....#.....##..#.........#.#.....#..#.......#..#.#............#.#.#.....#..##.....#..#..............#....#.#....##.....#......##..#...#......#..........#..........#.###....#.#...##.#.........##.#..#.....#.#.#......#...##..#.#...#....#...#.#.#.......##.#.........#.#...##.........#............#.#......#....#...#......#.............#.#......#................#...##........#...##......#....#..#..#.....#.#...##.#.#......##...#.#..#...#....##...#.#........#..........##.........#.#.....#.....###.#..#.........#......#......##.#...#.#..#..#.##..............#........##.#..#.#.............#..#.#.........#....##.##..#..#..#.....#...##.#......#....#..#.#....#...###...#.#.......#......#..#...#......##.#..#..#........#....#....#.##.#...#......###.....#.#........##..#.##.###.........#...##.....#..#....#.#............#...#..##..#..##....#.........#..#..#....###..........##..#...#...#..#.."
+data_input = ".#....#.###.........#..##.###.#.....##..............##.......#.#...#...#..#....#.....#....##..##.......#..........###..#.......#....####......#..#.#........#......................##..#....#...##..#...#..#...#....#....#..#.....#.#......#..#...#........#.#....#.#...##.........#...#.......#...##.#.#...#.......#....#........#.........##........#....#..........#.......#....##..........##.....#....#.........#.......#..##......#..#.#.#...#.................#.##.........#...#.#.....#........#....#.#.#.#......#.#...##...#.........##....#.#....#..#.....#.#......##.##...#.......#..#..##.....#..#.........#...##.....#..#.##.#...#.#.#.#.#.#.........#..#...#.##....#.....#......##..#.#..#....#....#####...........#...##...#.....#.......#....#.#.##......#..#..#.#.#....##..#......###.................#..#.#.#....#.....##..#.........#.#.....#..#.......#..#.#............#.#.#.....#..##.....#..#..............#....#.#....##.....#......##..#...#......#..........#..........#.###....#.#...##.#.........##.#..#.....#.#.#......#...##..#.#...#....#...#.#.#.......##.#.........#.#...##.........#............#.#......#....#...#......#.............#.#......#................#...##........#...##......#....#..#..#.....#.#...##.#.#......##...#.#..#...#....##...#.#........#..........##.........#.#.....#.....###.#..#.........#......#......##.#...#.#..#..#.##..............#........##.#..#.#.............#..#.#.........#....##.##..#..#..#.....#...##.#......#....#..#.#....#...###...#.#.......#......#..#...#......##.#..#..#........#....#....#.##.#...#......###.....#.#........##..#.##.###.........#...##.....#..#....#.#............#...#..##..#..##....#.........#..#..#....###..........##..#...#...#..#.."
 
 
 def count_occurences(arr, num):
@@ -146,164 +152,134 @@ def print_map(space_map, char):
         print('\n')
 
 
-def check_x_axis(space_map, x, y, asteroid):
+def check_x_axis(space_map, x, y, do_color):
     ans1 = 0
     ans2 = 0
-    # # print('x', x)
     for i in range(x - 1, 0, -1):
-        # # print(i)
-        #space_map[i][y] = red_start + "#" + end_color
-        if '#' in space_map[i][y]:
-            # # print('x, y', i, y)
-            if ans1 < 1:
-                # space_map[i][y] = green_start + "#" + end_color
-                ans1 += 1
-    # # print('\n')
+        if is_asteroid(space_map, i, y):
+            color_asteroid(space_map, i, y, GREEN, do_color)
+            ans1 += 1
+            break
     for i in range(x+1, len(space_map)):
-        # # print(i)
-        #space_map[i][y] = red_start + "#" + end_color
-        if '#' in space_map[i][y]:
-            # # print('x, y', i, y)
-            if ans2 < 1:
-                # space_map[i][y] = green_start + "#" + end_color
-                ans2 += 1
-    # # print("Count", min(ans1, 1), min(ans2, 1))
+        if is_asteroid(space_map, i, y):
+            color_asteroid(space_map, i, y, GREEN, do_color)
+            ans2 += 1
+            break
     return min(ans1, 1) + min(ans2, 1)
 
 
-def check_y_axis(space_map, x, y, asteroid):
+def check_y_axis(space_map, x, y, do_color):
     ans1 = 0
     ans2 = 0
-    # # print('y', y)
     for i in range(y - 1, 0, -1):
-        # # print(i)
-        # space_map[x][i] = red_start + "#" + end_color
-        if '#' in space_map[x][i]:
-            # # print('x, y', x, i)
-            if ans1 < 1:
-                # space_map[x][i] = green_start + "#" + end_color
-                ans1 += 1
+        if is_asteroid(space_map, x, i):
+            color_asteroid(space_map, x, i, GREEN, do_color)
+            ans1 += 1
+            break
     for i in range(y + 1, len(space_map)):
-        # # print(i)
-        # space_map[x][i] = red_start + "#" + end_color
-        if '#' in space_map[x][i]:
-            # # print('x, y', x, i)
-            if ans2 < 1:
-                # space_map[x][i] = green_start + "#" + end_color
-                ans2 += 1
-    # # print("Count", min(ans1, 1), min(ans2, 1))
+        if is_asteroid(space_map, x, i):
+            color_asteroid(space_map, x, i, GREEN, do_color)
+            ans2 += 1
+            break
     return min(ans1, 1) + min(ans2, 1)
 
 
-def check_diagonals(space_map, x_from, y_from, x_to, y_to, asteroid):
-    # check x and y in seen
-    #print(f"For x and y: {x_to},{y_to}")
-    top = y_to - y_from
-    bottom = x_to - x_from
-    m = (top) / (bottom)
+def check_diagonals(space_map, x_from, y_from, x_to, y_to, asteroid, do_color):
+    m = (y_to - y_from) / (x_to - x_from)
     b = y_from - m * x_from
-    ## print("Top and bottom:", top, bottom)
-    ## print(f"Slope and intercetp: {m}, {b}")
 
     if (m, b) in slope_checked[asteroid]:
-        # print("Seen")
         return 0
     else:
         slope_checked[asteroid].append((m, b))
-
-    # space_map[x_to][y_to] = green_start + "#" + end_color
+        color_asteroid(space_map, x_to, y_to, GREEN, do_color)
     return 1
 
 
-green_start = "\033[0;32;40m"
-yellow_start = "\033[0;33;40m"
-blue_start = "\033[0;34;40m"
-end_color = "\033[0m"
-red_start = "\033[0;31;40m"
+def is_asteroid(space_map, x, y):
+    return '#' in space_map[x][y]
+
+
+def color_asteroid(_map, x, y, color, do_color, char='#'):
+    if do_color:
+        _map[x][y] = color + str(char) + END
+
+
+def find_best_station(x_start, x_end, y_start, y_end, do_color):
+    asteroid_index = -1
+    max_check = 0
+    coords = (0, 0)
+    # For every location in the map
+    for y_check in range(y_start, y_end):
+        for x_check in range(x_start, x_end):
+            # This is an asteroid, check all the asteroid it can see
+            color_asteroid(space_map, x_check, y_check, RED, do_color)
+            if is_asteroid(space_map, x_check, y_check):
+                asteroid_index += 1
+                # Look along its X axis
+                total_seen[x_check][y_check] += check_x_axis(space_map,
+                                                             x_check,
+                                                             y_check,
+                                                             do_color)
+                # Look along its Y axis
+                total_seen[x_check][y_check] += check_y_axis(space_map,
+                                                             x_check,
+                                                             y_check,
+                                                             do_color)
+
+                slope_checked[asteroid_index].clear()
+                for y in range(y_check + 1, len(space_map)):
+                    for x in range(x_check + 1, len(space_map)):
+                        if is_asteroid(space_map, x, y):
+                            total_seen[x_check][y_check] += check_diagonals(
+                                space_map, x_check, y_check, x,
+                                y, asteroid_index, do_color)
+
+                slope_checked[asteroid_index].clear()
+                for y in range(y_check - 1, -1, -1):
+                    for x in range(x_check + 1, len(space_map)):
+                        if is_asteroid(space_map, x, y):
+                            total_seen[x_check][y_check] += check_diagonals(
+                                space_map, x_check, y_check, x,
+                                y, asteroid_index, do_color)
+
+                slope_checked[asteroid_index].clear()
+                for y in range(y_check - 1, -1, -1):
+                    for x in range(x_check - 1, -1, -1):
+                        if is_asteroid(space_map, x, y):
+                            total_seen[x_check][y_check] += check_diagonals(
+                                space_map, x_check, y_check, x,
+                                y, asteroid_index, do_color)
+
+                slope_checked[asteroid_index].clear()
+                for y in range(y_check + 1, len(space_map)):
+                    for x in range(x_check - 1, -1, -1):
+                        if is_asteroid(space_map, x, y):
+                            total_seen[x_check][y_check] += check_diagonals(
+                                space_map, x_check, y_check, x,
+                                y, asteroid_index, do_color)
+
+                if total_seen[x_check][y_check] > max_check:
+                    max_check = total_seen[x_check][y_check]
+                    coords = (x_check, y_check)
+
+    return max_check, coords
+
 
 size = int(math.sqrt(len(data_input)))
 space_map = [[y for y in data_input[x::size]] for x in range(size)]
 num_asteroids = count_occurences(data_input, '#')
 slope_checked = [[] for x in range(num_asteroids)]
 total_seen = [[0 for y in range(size)] for x in range(size)]
-asteroid_index = -1
-max_asteroid = 0
-coords = (0, 0)
 
-# For every location in the map
-for asteroid_y in range(len(space_map)):
-    for asteroid_x in range(len(space_map)):
-        # This is an asteroid, check all the asteroid it can see
-        #space_map[asteroid_x][asteroid_y] = yellow_start + '#' + end_color
-        if '#' in space_map[asteroid_x][asteroid_y]:
-            asteroid_index += 1
-            if(asteroid_index >= len(slope_checked)):
-                print("*", asteroid_index)
-            # Look along its X axis
-            total_seen[asteroid_x][asteroid_y] += check_x_axis(space_map,
-                                                               asteroid_x,
-                                                               asteroid_y,
-                                                               asteroid_index)
-            # Look along its Y axis
-            total_seen[asteroid_x][asteroid_y] += check_y_axis(space_map,
-                                                               asteroid_x,
-                                                               asteroid_y,
-                                                               asteroid_index)
-            #print_map(space_map, ' ')
-            slope_checked[asteroid_index].clear()
-            # Check every other asteroid
-            for y_forward in range(asteroid_y + 1, len(space_map)):
-                for x_forward in range(asteroid_x + 1, len(space_map)):
-                    #print(x_forward, y_forward)
-                    # If this location is an asteroid, check if we can see it
-                    if '#' in space_map[x_forward][y_forward]:
-                        # space_map[x_forward][y_forward] = blue_start + '#' + end_color
-                        #print(f"-X and Y From {asteroid_x}, {asteroid_y}")
-                        total_seen[asteroid_x][asteroid_y] += check_diagonals(
-                            space_map, asteroid_x, asteroid_y, x_forward,
-                            y_forward, asteroid_index)
-            #print_map(space_map, ' ')
-            slope_checked[asteroid_index].clear()
-            for y_backward in range(asteroid_y - 1, -1, -1):
-                for x_backward in range(asteroid_x - 1, -1, -1):
-                    #print(x_backward, y_backward)
-                    # If this location is an asteroid, check if we can see it
-                    if '#' in space_map[x_backward][y_backward]:
-                        # space_map[x_backward][y_backward] = blue_start + '#' + end_color
-                        #print(f"X and Y From {asteroid_x}, {asteroid_y}")
-                        total_seen[asteroid_x][asteroid_y] += check_diagonals(
-                            space_map, asteroid_x, asteroid_y, x_backward,
-                            y_backward, asteroid_index)
-            #print_map(space_map, ' ')
-            slope_checked[asteroid_index].clear()
-            for y_backward in range(asteroid_y - 1, -1, -1):
-                for x_forward in range(asteroid_x + 1, len(space_map)):
-                    #print('*', x_forward, y_backward)
-                    # If this location is an asteroid, check if we can see it
-                    if '#' in space_map[x_forward][y_backward]:
-                        # space_map[x_forward][y_backward] = blue_start + '#' + end_color
-                        #print(f"X and Y From {asteroid_x}, {asteroid_y}")
-                        total_seen[asteroid_x][asteroid_y] += check_diagonals(
-                            space_map, asteroid_x, asteroid_y, x_forward,
-                            y_backward, asteroid_index)
-            #print_map(space_map, ' ')
-            slope_checked[asteroid_index].clear()
-            for y_forward in range(asteroid_y + 1, len(space_map)):
-                for x_backward in range(asteroid_x - 1, -1, -1):
-                    #print("-", x_backward, y_forward)
-                    # If this location is an asteroid, check if we can see it
-                    if '#' in space_map[x_backward][y_forward]:
-                        # space_map[x_backward][y_forward] = blue_start + '#' + end_color
-                        #print(f"X and Y From {asteroid_x}, {asteroid_y}")
-                        total_seen[asteroid_x][asteroid_y] += check_diagonals(
-                            space_map, asteroid_x, asteroid_y, x_backward,
-                            y_forward, asteroid_index)
 
-            if total_seen[asteroid_x][asteroid_y] > max_asteroid:
-                max_asteroid = total_seen[asteroid_x][asteroid_y]
-                coords = (asteroid_x, asteroid_y)
-                
-print_map(space_map, ' ')
-print_map(total_seen, ', ')
-print("*", asteroid_index)
-print("Max value is:", max_asteroid, "Coords are:", coords)
+if __name__ == "__main__":
+    max_check, coords = find_best_station(0, len(space_map),
+                                          0, len(space_map), False)
+
+    find_best_station(coords[0], coords[0] + 1,
+                      coords[1], coords[1] + 1, True)
+    color_asteroid(total_seen, coords[0], coords[1], GREEN, True, max_check)
+    print_map(total_seen, ', ')
+    print_map(space_map, '  ')
+    print("Max value is:", max_check, "Coords are:", coords)
