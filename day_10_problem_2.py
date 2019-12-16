@@ -91,4 +91,5 @@ def format_output(coords):
 if __name__ == "__main__":
     print("I cheated by solving this in Unity :D")
     print("Coords are:", (28, 26), ':',  format_output((28, 26)))
+    print("https://github.com/GlassToeStudio/Advent-of-Code-Day-10")
 # Your puzzle answer was 2628
