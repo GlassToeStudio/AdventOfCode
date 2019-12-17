@@ -83,13 +83,70 @@ multiply its X coordinate by 100 and then add its Y coordinate?
 (For example, 8,2 becomes 802.)
 '''
 
+import math
+
+
+data_input = ".#....#.###.........#..##.###.#.....##..............##.......#.#...#...#..#....#.....#....##..##.......#..........###..#.......#....####......#..#.#........#......................##..#....#...##..#...#..#...#....#....#..#.....#.#......#..#...#........#.#....#.#...##.........#...#.......#...##.#.#...#.......#....#........#.........##........#....#..........#.......#....##..........##.....#....#.........#.......#..##......#..#.#.#...#.................#.##.........#...#.#.....#........#....#.#.#.#......#.#...##...#.........##....#.#....#..#.....#.#......##.##...#.......#..#..##.....#..#.........#...##.....#..#.##.#...#.#.#.#.#.#.........#..#...#.##....#.....#......##..#.#..#....#....#####...........#...##...#.....#.......#....#.#.##......#..#..#.#.#....##..#......###.................#..#.#.#....#.....##..#.........#.#.....#..#.......#..#.#............#.#.#.....#..##.....#..#..............#....#.#....##.....#......##..#...#......#..........#..........#.###....#.#...##.#.........##.#..#.....#.#.#......#...##..#.#...#....#...#.#.#.......##.#.........#.#...##.........#............#.#......#....#...#......#.............#.#......#................#...##........#...##......#....#..#..#.....#.#...##.#.#......##...#.#..#...#....##...#.#........#..........##.........#.#.....#.....###.#..#.........#......#......##.#...#.#..#..#.##..............#........##.#..#.#.............#..#.#.........#....##.##..#..#..#.....#...##.#......#....#..#.#....#...###...#.#.......#......#..#...#......##.#..#..#........#....#....#.##.#...#......###.....#.#........##..#.##.###.........#...##.....#..#....#.#............#...#..##..#..##....#.........#..#..#....###..........##..#...#...#..#.."
+
+
+def is_asteroid(space_map, x, y):
+    return '#' in space_map[x][y]
+
+
+def is_not_me(me_x, me_y, x, y):
+    return (x != me_x or y != me_y)
+
+
+def check_asteroid(space_map, x_from, y_from, x_to, y_to, seen):
+    dy = (y_to - y_from)
+    dx = (x_to - x_from)
+    gcd = math.gcd(dy, dx)
+    gcd = gcd * -1 if gcd < 0 else gcd
+    val = math.atan2(dy, dx)
+    if dy < 0 and dx < 0:
+        val += (2 * math.pi)
+    dx = dx // gcd
+    dy = dy // gcd
+    while not is_asteroid(space_map, dx + x_from, dy + y_from):
+        dx *= gcd
+        dy *= gcd
+    seen[val] = (dx + x_from, dy + y_from)
+
+
+def find_200th_asteroid(seen):
+    x_check = 28 # from part 1
+    y_check = 29 # from part 1
+
+    for y in range(0, len(space_map)):
+        for x in range(0, len(space_map)):
+            if is_asteroid(space_map, x, y):
+                if is_not_me(x_check, y_check, x, y):
+                    check_asteroid(
+                        space_map,
+                        x_check,
+                        y_check,
+                        x,
+                        y,
+                        seen)
+
+    answer = sorted(seen)
+    return seen[answer[199]]
+
 
 def format_output(coords):
     return 100 * coords[0] + coords[1]
 
 
+size = int(math.sqrt(len(data_input)))
+space_map = [[y for y in data_input[x::size]] for x in range(size)]
+
+
 if __name__ == "__main__":
-    print("I cheated by solving this in Unity :D")
-    print("Coords are:", (28, 26), ':',  format_output((28, 26)))
-    print("https://github.com/GlassToeStudio/Advent-of-Code-Day-10")
+    seen = {}
+    result = find_200th_asteroid(seen)
+    print(
+        "Coords for 200th asteroid are:",
+        result[0], ',',
+        result[1], ':', 
+        format_output((result[0], result[1])))
 # Your puzzle answer was 2628
