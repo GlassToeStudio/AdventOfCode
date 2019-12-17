@@ -11,6 +11,7 @@ mode, the program will output a single value: the coordinates of the distress
 signal.
 
 Run the BOOST program in sensor boost mode. What are the coordinates of the
+distress signal?
 '''
 
 import math
