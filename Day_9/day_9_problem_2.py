@@ -1,20 +1,21 @@
 ''' --- Part Two ---
-You're not sure what it's trying to paint, but it's definitely not a
-registration identifier. The Space Police are getting impatient.
+You now have a complete Intcode computer.
 
-Checking your external ship cameras again, you notice a white panel marked
-"emergency hull painting robot starting panel". The rest of the panels are
-still black, but it looks like the robot was expecting to start on a white
-panel, not a black one.
+Finally, you can lock on to the Ceres distress signal! You just need to boos
+your sensors using the BOOST program.
 
-Based on the Space Law Space Brochure that the Space Police attached to one of
-your windows, a valid registration identifier is always eight capital letters.
-After starting the robot on a single white panel instead, what registration
-identifier does it paint on your hull?
+The program runs in sensor boost mode by providing the input instruction the
+value 2. Once run, it will boost the sensors automatically, but it might take
+a few seconds to complete the operation on slower hardware. In sensor boost
+mode, the program will output a single value: the coordinates of the distress
+signal.
+
+Run the BOOST program in sensor boost mode. What are the coordinates of the
+distress signal?
 '''
 
 import math
-from PIL import Image
+from itertools import permutations as permu
 
 
 class Instruction:
@@ -179,7 +180,8 @@ def get_write_param_by_mode(mode, param, codes):
         1, immediate mode. In immediate mode, a parameter is interpreted
         as a value - if the parameter is 50, its value is simply 50.
 
-        Parameters that an instruction writes to will never be in immediate mode.
+        Parameters that an instruction writes to will never be in immediate
+        mode.
 
     Args:
         mode (int): The parameter mode for the instruction
@@ -229,50 +231,20 @@ def load_program(intcode):
     return program
 
 
-def format_data(paint_map):
-    xmax = max(x for w, x, y, z in paint_map.values())
-    xmin = min(x for w, x, y, z in paint_map.values())
-    ymax = max(y for w, x, y, z in paint_map.values())
-    ymin = min(y for w, x, y, z in paint_map.values())
-    width = xmax - xmin + 1
-    height = ymax - ymin + 1
-    data = [[0 for _ in range(height)] for _ in range(width)]
-    k = 0
-    m = 0
-    for j in range(ymax, ymin - 1, -1):
-        for i in range(xmin, xmax):
-            if (i, j) in paint_map:
-                data[k][m] = paint_map[(i, j)][3]
-            else:
-                data[k][m] = 0
-            k += 1
-        m += 1
-        k = 0
-    return data, width, height
+def generate_sequences(start, end):
+    ''' Return all permutations of the given range of numbers.
 
+    Args:
+        start (int): Beginning of the range.
+        end (int): End of the range.
 
-def create_answer_text(data_input, width, height):
-    answer = ''
-    for row in range(height):
-        for col in range(width):
-            if data_input[col][row] == 1:
-                answer = f"{answer}█"
-            else:
-                answer = f"{answer} "
-        answer = f"{answer}\n"
-    with open("day-11-password.txt", "w", encoding='utf-8') as pass_file:
-        pass_file.write(answer)
-    print(answer)
-
-
-def create_answer_image(data_input, p, width, height):
-    for col in range(height):
-        for row in range(width):
-            if data_input[row][col] == 1:
-                p[row, col] = (255, 255, 255)
-            elif data_input[row][col] == 0:
-                p[row, col] = (0, 0, 0)
-    return p
+    Returns:
+        int[[]]: Every permutation of the given range.
+    '''
+    sequence = []
+    for i, j, k, l, m in permu(range(start, end), 5):
+        sequence.append([i, j, k, l, m])
+    return sequence
 
 
 # Operations:
@@ -386,7 +358,7 @@ def output_operation(codes, params, modes, **kwargs):
     return 4
 
 
-def automated_output_operation(codes, params, modes, **kwargs):
+def automated_output_operation(codes, params, **kwargs):
     ''' Add the value from the intcode program at location params[0] to the
     input_queue
 
@@ -403,8 +375,7 @@ def automated_output_operation(codes, params, modes, **kwargs):
         int: opcode instruction 4
     '''
 
-    param_1 = get_read_param_by_mode(modes[2], params[0], codes)
-    input_queue.append(param_1)
+    input_queue.append(codes[params[0]])
     return 4
 
 
@@ -529,10 +500,8 @@ def halt_operation(**kwargs):
 # Setup
 add_instruction = Instruction(add_operation, 3)
 mult_instruction = Instruction(mul_operation, 3)
-# input_instruction = Instruction(input_operation, 1)
 input_instruction = Instruction(automated_input_operation, 1)
-# output_instruction = Instruction(output_operation, 1)
-output_instruction = Instruction(automated_output_operation, 1)
+output_instruction = Instruction(output_operation, 1)
 jump_if_true_instruction = Instruction(jump_if_true_operation, 2)
 jump_if_false_instruction = Instruction(jump_if_false_operation, 2)
 less_than_instruction = Instruction(less_than_operation, 3)
@@ -554,8 +523,9 @@ instructions = {
 }
 
 intcode = [
-    3,8,1005,8,311,1106,0,11,0,0,0,104,1,104,0,3,8,1002,8,-1,10,101,1,10,10,4,10,108,0,8,10,4,10,1002,8,1,28,2,103,7,10,3,8,1002,8,-1,10,101,1,10,10,4,10,1008,8,1,10,4,10,1001,8,0,55,2,3,6,10,1,101,5,10,1,6,7,10,3,8,1002,8,-1,10,101,1,10,10,4,10,1008,8,0,10,4,10,1001,8,0,89,1,1108,11,10,2,1002,13,10,1006,0,92,1,2,13,10,3,8,102,-1,8,10,1001,10,1,10,4,10,1008,8,0,10,4,10,101,0,8,126,3,8,1002,8,-1,10,101,1,10,10,4,10,108,1,8,10,4,10,1002,8,1,147,1,7,0,10,3,8,1002,8,-1,10,1001,10,1,10,4,10,108,0,8,10,4,10,101,0,8,173,1006,0,96,3,8,102,-1,8,10,101,1,10,10,4,10,108,0,8,10,4,10,1001,8,0,198,1,3,7,10,1006,0,94,2,1003,20,10,3,8,102,-1,8,10,1001,10,1,10,4,10,1008,8,1,10,4,10,102,1,8,232,3,8,102,-1,8,10,101,1,10,10,4,10,108,1,8,10,4,10,102,1,8,253,1006,0,63,1,109,16,10,3,8,1002,8,-1,10,101,1,10,10,4,10,1008,8,1,10,4,10,101,0,8,283,2,1107,14,10,1,105,11,10,101,1,9,9,1007,9,1098,10,1005,10,15,99,109,633,104,0,104,1,21102,837951005592,1,1,21101,328,0,0,1105,1,432,21101,0,847069840276,1,21101,0,339,0,1106,0,432,3,10,104,0,104,1,3,10,104,0,104,0,3,10,104,0,104,1,3,10,104,0,104,1,3,10,104,0,104,0,3,10,104,0,104,1,21102,179318123543,1,1,21102,386,1,0,1106,0,432,21102,1,29220688067,1,21102,1,397,0,1106,0,432,3,10,104,0,104,0,3,10,104,0,104,0,21102,709580567396,1,1,21102,1,420,0,1105,1,432,21102,1,868498694912,1,21102,431,1,0,1106,0,432,99,109,2,22101,0,-1,1,21101,40,0,2,21101,0,463,3,21101,0,453,0,1105,1,496,109,-2,2106,0,0,0,1,0,0,1,109,2,3,10,204,-1,1001,458,459,474,4,0,1001,458,1,458,108,4,458,10,1006,10,490,1102,1,0,458,109,-2,2105,1,0,0,109,4,1202,-1,1,495,1207,-3,0,10,1006,10,513,21102,0,1,-3,21201,-3,0,1,21202,-2,1,2,21101,0,1,3,21101,0,532,0,1106,0,537,109,-4,2106,0,0,109,5,1207,-3,1,10,1006,10,560,2207,-4,-2,10,1006,10,560,22102,1,-4,-4,1105,1,628,21201,-4,0,1,21201,-3,-1,2,21202,-2,2,3,21101,0,579,0,1105,1,537,22101,0,1,-4,21102,1,1,-1,2207,-4,-2,10,1006,10,598,21102,1,0,-1,22202,-2,-1,-2,2107,0,-3,10,1006,10,620,22102,1,-1,1,21101,0,620,0,106,0,495,21202,-2,-1,-2,22201,-4,-2,-4,109,-5,2106,0,0]
+    1102, 34463338, 34463338, 63, 1007, 63, 34463338, 63, 1005, 63, 53, 1102, 1, 3, 1000, 109, 988, 209, 12, 9, 1000, 209, 6, 209, 3, 203, 0, 1008, 1000, 1, 63, 1005, 63, 65, 1008, 1000, 2, 63, 1005, 63, 904, 1008, 1000, 0, 63, 1005, 63, 58, 4, 25, 104, 0, 99, 4, 0, 104, 0, 99, 4, 17, 104, 0, 99, 0,0,1102,1,21,1004,1101,28,0,1016,1101,0,27,1010,1102,36,1,1008,1102,33,1,1013,1101,0,22,1012,1101,0,37,1011,1102,34,1,1017,1102,466,1,1027,1102,1,484,1029,1102,1,699,1024,1102,1,1,1021,1101,0,0,1020,1102,1,24,1015,1101,0,473,1026,1101,653,0,1022,1102,26,1,1007,1102,25,1,1006,1101,0,39,1014,1102,646,1,1023,1101,690,0,1025,1102,1,29,1019,1101,32,0,1018,1101,30,0,1002,1101,0,20,1001,1102,1,38,1005,1102,1,23,1003,1101,0,31,1000,1101,35,0,1009,1101,0,493,1028,109,5,1208,0,37,63,1005,63,201,1001,64,1,64,1106,0,203,4,187,1002,64,2,64,109,-4,2107,36,8,63,1005,63,223,1001,64,1,64,1105,1,225,4,209,1002,64,2,64,109,18,21107,40,41,-9,1005,1010,243,4,231,1105,1,247,1001,64,1,64,1002,64,2,64,109,6,21107,41,40,-9,1005,1016,267,1001,64,1,64,1106,0,269,4,253,1002,64,2,64,109,-19,21102,42,1,5,1008,1011,42,63,1005,63,291,4,275,1105,1,295,1001,64,1,64,1002,64,2,64,109,15,1205,0,309,4,301,1105,1,313,1001,64,1,64,1002,64,2,64,109,-27,2101,0,9,63,1008,63,20,63,1005,63,333,1106,0,339,4,319,1001,64,1,64,1002,64,2,64,109,19,21102,43,1,6,1008,1019,45,63,1005,63,363,1001,64,1,64,1105,1,365,4,345,1002,64,2,64,109,1,21108,44,47,-3,1005,1011,385,1001,64,1,64,1106,0,387,4,371,1002,64,2,64,109,-22,1201,9,0,63,1008,63,21,63,1005,63,411,1001,64,1,64,1106,0,413,4,393,1002,64,2,64,109,9,1207,0,19,63,1005,63,433,1001,64,1,64,1106,0,435,4,419,1002,64,2,64,109,-9,2107,30,8,63,1005,63,453,4,441,1105,1,457,1001,64,1,64,1002,64,2,64,109,25,2106,0,10,1001,64,1,64,1106,0,475,4,463,1002,64,2,64,109,11,2106,0,0,4,481,1001,64,1,64,1105,1,493,1002,64,2,64,109,-18,2108,21,-6,63,1005,63,511,4,499,1106,0,515,1001,64,1,64,1002,64,2,64,109,-12,2108,18,6,63,1005,63,535,1001,64,1,64,1106,0,537,4,521,1002,64,2,64,109,19,21101,45,0,-7,1008,1010,45,63,1005,63,563,4,543,1001,64,1,64,1105,1,563,1002,64,2,64,109,-10,1207,-5,31,63,1005,63,581,4,569,1106,0,585,1001,64,1,64,1002,64,2,64,109,-8,2102,1,5,63,1008,63,21,63,1005,63,611,4,591,1001,64,1,64,1105,1,611,1002,64,2,64,109,5,1201,0,0,63,1008,63,21,63,1005,63,633,4,617,1106,0,637,1001,64,1,64,1002,64,2,64,109,13,2105,1,6,1001,64,1,64,1106,0,655,4,643,1002,64,2,64,109,-7,1202,-3,1,63,1008,63,26,63,1005,63,681,4,661,1001,64,1,64,1106,0,681,1002,64,2,64,109,12,2105,1,2,4,687,1001,64,1,64,1105,1,699,1002,64,2,64,109,-28,1208,8,30,63,1005,63,717,4,705,1106,0,721,1001,64,1,64,1002,64,2,64,109,10,1202,1,1,63,1008,63,40,63,1005,63,745,1001,64,1,64,1105,1,747,4,727,1002,64,2,64,109,10,21108,46,46,-2,1005,1012,765,4,753,1105,1,769,1001,64,1,64,1002,64,2,64,109,-2,1205,8,781,1106,0,787,4,775,1001,64,1,64,1002,64,2,64,109,-9,2101,0,0,63,1008,63,23,63,1005,63,809,4,793,1105,1,813,1001,64,1,64,1002,64,2,64,109,9,1206,8,831,4,819,1001,64,1,64,1106,0,831,1002,64,2,64,109,-9,2102,1,-2,63,1008,63,22,63,1005,63,855,1001,64,1,64,1106,0,857,4,837,1002,64,2,64,109,4,21101,47,0,10,1008,1017,50,63,1005,63,877,1105,1,883,4,863,1001,64,1,64,1002,64,2,64,109,18,1206,-4,895,1105,1,901,4,889,1001,64,1,64,4,64,99,21101,0,27,1,21102,915,1,0,1106,0,922,21201,1,56639,1,204,1,99,109,3,1207,-2,3,63,1005,63,964,21201,-2,-1,1,21102,1,942,0,1106,0,922,22102,1,1,-1,21201,-2,-3,1,21101,0,957,0,1106,0,922,22201,1,-1,-2,1106,0,968,22102,1,-2,-2,109,-3,2106,0,0]
 
+addresses = [0, 0, 0, 0, 0]
 input_queue = []
 relative_base = [0]
 
@@ -585,75 +555,11 @@ def run_intcode_program(intcode, current_address, current_amp):
             current_address
             )
         current_address += instructions[opcode].steps
-        yield r
     return r
 
 
-def run_robot():
-    paint_map = {}
-    location = (0, 0)
-    current_direction = 0
-    move_instruction = ()
-    count = 0
-
-    input_queue.append(1)
-    program = load_program(intcode)
-    
-    for r in run_intcode_program(program, 0, 0):
-        if r == 4 and len(input_queue) > 1:
-            # Do a robot thing
-
-            direction_instruction = input_queue.pop() # Direction
-            color = input_queue.pop() # Color
-
-            if direction_instruction == 0:
-                current_direction = current_direction - 1 if current_direction > 0 else 3
-            else:
-                current_direction = current_direction + 1 if current_direction < 3 else 0
-
-            x, y = directions[current_direction]
-            next_location = (location[0] + x, location[1] + y)
-
-            if location not in paint_map:
-                count += 1
-
-            paint_map[location] = color, location[0], location[1], 0 if color == 0 else 1
-                            
-            location = next_location
-            
-            if location in paint_map:
-                input_queue.append(paint_map[location][0])
-            else:
-                input_queue.append(0)
-        pass
-    return paint_map
-
-
-left = (-1, 0)
-right = (1, 0)
-up = (0, 1)
-down = (0, -1)
-
-directions = {
-    0: up,
-    1: right,
-    2: down,
-    3: left
-}
-
-
 if __name__ == "__main__":
-    paint_map = run_robot()
-    data, width, height = format_data(paint_map)
-    img = Image.new('RGB', (width, height), color='white')
-    pixels = img.load()
-    pixels = create_answer_image(data, pixels, width, height)
-    create_answer_text(data, width, height)
-    img.save('day-11-password.png')
-# Your puzzle answer was UZAEKBLP.
-#  █  █ ████  ██  ████ █  █ ███  █    ███   
-#  █  █    █ █  █ █    █ █  █  █ █    █  █  
-#  █  █   █  █  █ ███  ██   ███  █    █  █  
-#  █  █  █   ████ █    █ █  █  █ █    ███   
-#  █  █ █    █  █ █    █ █  █  █ █    █     
-#   ██  ████ █  █ ████ █  █ ███  ████ █  
+    input_queue.append(2)
+    run_intcode_program(load_program(intcode), 0, 0)
+    # Your puzzle answer was 77944
+

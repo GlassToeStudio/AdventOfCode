@@ -375,7 +375,7 @@ if __name__ == "__main__":
                                                             img,
                                                             2)
 
-    img.save('wire-diagram-closest-intersection.png')
+    img.save('Day_3/wire-diagram-closest-intersection.png')
 
     print(f"Minimun distance = {min_distance}")
     # Your puzzle answer was 245.

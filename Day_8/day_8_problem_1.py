@@ -84,10 +84,10 @@ if __name__ == "__main__":
     width = 25
     height = 6
     # Just too much data to keep in this .py file :(
-    with open("Data/day-8.txt", "r") as in_file:
+    with open("Day_8/Data/day-8.txt", "r") as in_file:
         input_data = in_file.read()
     layer_data = process_data(input_data, width, height)
     print(
-        "The number of 1s multiplied by the nuumber of 2s"
-        f" on the layer with the least 0s is : {get_answer(layer_data, 0)}")
+        "\nThe number of 1s multiplied by the nuumber of 2s"
+        f" on the layer with the least 0s is : {get_answer(layer_data, 0)}\n")
 # Your puzzle answer was 2016
