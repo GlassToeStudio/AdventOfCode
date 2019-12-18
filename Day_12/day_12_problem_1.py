@@ -246,15 +246,14 @@ class Moon:
         return self.kinetic_energy * self.potential_energy
 
     def output(self):
-        return f"pos=<{self.position.x}, {self.position.y}, {self.position.z}>, vel=<{self.velocity.x}, {self.velocity.y}, {self.velocity.z}>"
+        return (
+            f"pos=<{self.position.x}, {self.position.y}, {self.position.z}>"
+            f",vel=<{self.velocity.x}, {self.velocity.y}, {self.velocity.z}>")
 
     def __update_velocity__(self, me, them):
-        if me < them:
-            return 1
-        elif me > them:
-            return -1
-        else:
-            return 0
+        if me < them: return 1
+        elif me > them: return -1
+        else: return 0
 
     def __update_kinetic_energy__(self):
         self.kinetic_energy = (
@@ -298,18 +297,17 @@ def apply_velocity(moons):
 def get_output(moons):
     for moon in moons:
         print(moon.output())
+    print('\n')
 
 
 def get_total_energy(moons, steps):
     get_output(moons)
-    print('\n')
 
     for i in range(steps):
         apply_gravity(moons)
         apply_velocity(moons)
         if(i % 100 == 0):
             get_output(moons)
-            print('\n')
 
     total = 0
     for moon in moons:
@@ -321,15 +319,16 @@ input = "<x=3, y=3, z=0><x=4, y=-16, z=2><x=-10, y=-6, z=5><x=-3, y=0, z=-13>"
 
 
 if __name__ == "__main__":
-    out = format_input(input)
-
-    Io = Moon(out[0])
-    Europa = Moon(out[1])
-    Ganymede = Moon(out[2])
-    Callisto = Moon(out[3])
+    positions = format_input(input)
+    steps = 1000
+    Io = Moon(positions[0])
+    Europa = Moon(positions[1])
+    Ganymede = Moon(positions[2])
+    Callisto = Moon(positions[3])
 
     moons = [Io, Europa, Ganymede, Callisto]
 
-    total = get_total_energy(moons, 1000)
+    total = get_total_energy(moons, steps)
 
-    print("To total energy in the system after 1000 steps is", total)
+    print(f"To total energy in the system after {steps} steps is {total}")
+    # Your puzzle answer was 12351.
