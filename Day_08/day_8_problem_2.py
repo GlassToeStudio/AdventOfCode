@@ -89,7 +89,7 @@ def create_answer_text(pixel_map, width, height):
             else:
                 answer = f"{answer} "
         answer = f"{answer}\n"
-    with open("Day_8/day-8-password.txt", "w", encoding='utf-8') as pass_file:
+    with open("Day_08/day-8-password.txt", "w", encoding='utf-8') as pass_file:
         pass_file.write(answer)
     print(answer)
 
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     height = 6
 
     # Just too much data to keep in this .py file :(
-    with open("Day_8/Data/day-8.txt", "r") as in_file:
+    with open("Day_08/Data/day-8.txt", "r") as in_file:
         image_data = in_file.read()
     layer_data = process_data(image_data, width, height)
     pixel_map = format_pixel_data(layer_data, width, height)
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     pixels = img.load()
     pixels = create_answer_image(pixel_map, pixels, width, height)
     create_answer_text(pixel_map, width, height)
-    img.save('Day_8/day-8-password.png')
+    img.save('Day_08/day-8-password.png')
 
 # Your puzzle answer was
 # █  █ ████  ██  ████ █  █

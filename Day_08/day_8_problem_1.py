@@ -84,7 +84,7 @@ if __name__ == "__main__":
     width = 25
     height = 6
     # Just too much data to keep in this .py file :(
-    with open("Day_8/Data/day-8.txt", "r") as in_file:
+    with open("Day_08/Data/day-8.txt", "r") as in_file:
         input_data = in_file.read()
     layer_data = process_data(input_data, width, height)
     print(
