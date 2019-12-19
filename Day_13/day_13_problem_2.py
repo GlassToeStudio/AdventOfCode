@@ -27,9 +27,14 @@ from os import system, name
 import msvcrt
 import time
 
+GREEN = "\033[0;32;40m"
+YELLOW = "\033[0;33;40m"
+BLUE = "\033[0;34;40m"
+RED = "\033[0;31;40m"
+END = "\033[0m"
 
-def clear():
-    _ = system('cls')
+IO_queue = []
+relative_base = [0]
 
 
 class Instruction:
@@ -267,6 +272,10 @@ def add_operation(codes, params, modes, **kwargs):
     param_1 = get_read_param_by_mode(modes[2], params[0], codes)
     param_2 = get_read_param_by_mode(modes[1], params[1], codes)
     param_3 = get_write_param_by_mode(modes[0], params[2], codes)
+    if codes[param_3] == board[len(board) - 1][0] and scored[0] == 1:
+        # print('location =', param_3, codes[param_3], '=', param_1, '+',
+        # param_2, 'which is', param_1 + param_2)
+        scored[0] = 0
     codes[param_3] = param_1 + param_2
     return 1
 
@@ -315,7 +324,24 @@ def input_operation(codes, params, modes, **kwargs):
     return 3
 
 
-def automated_input_operation(codes, params, modes, **kwargs):
+def ai_input_operation(codes, params, modes, **kwargs):
+    print_board()
+    player_dir = 0
+    if ball_pos['previous'] < ball_pos['current']:
+        player_dir = 1
+    elif ball_pos['previous'] > ball_pos['current']:
+        player_dir = -1
+    else:
+        player_dir = 0
+
+    param_1 = get_write_param_by_mode(modes[2], params[0], codes)
+    if(len(AI_queue) == 0):
+        AI_queue.append(player_dir)
+    codes[param_1] = AI_queue.pop()
+    return 3
+
+
+def arrow_input_operation(codes, params, modes, **kwargs):
     ''' Modify a value at location in the intcode program with the next
     available value in the input queue.
 
@@ -334,7 +360,7 @@ def automated_input_operation(codes, params, modes, **kwargs):
     '''
 
     print_board()
-    time = 5000
+    time = 10000
     player_dir = 0
     inital_pos_x = player_pos[0][0]
     while time > 0:
@@ -346,13 +372,15 @@ def automated_input_operation(codes, params, modes, **kwargs):
                 player_dir = player_dir - 1 if player_dir > -1 else -1
                 if (player_pos[0][0] + player_dir) >= (inital_pos_x - 1):
                     update_board([(player_pos[0][0], player_pos[0][1], 0)])
-                    update_board([(player_pos[0][0] + player_dir, player_pos[0][1], 3)])
+                    update_board([(player_pos[0][0] + player_dir,
+                                   player_pos[0][1], 3)])
                     print_board()
             elif str(pressedKey) == "b'd'" or str(pressedKey) == "b'M'":
                 player_dir = player_dir + 1 if player_dir < 1 else 1
                 if (player_pos[0][0] + player_dir) <= (inital_pos_x + 1):
                     update_board([(player_pos[0][0], player_pos[0][1], 0)])
-                    update_board([(player_pos[0][0] + player_dir, player_pos[0][1], 3)])
+                    update_board([(player_pos[0][0] + player_dir,
+                                   player_pos[0][1], 3)])
                     print_board()
             else:
                 player_dir = 0
@@ -527,39 +555,6 @@ def halt_operation(**kwargs):
     return 99
 
 
-# Setup
-add_instruction = Instruction(add_operation, 3)
-mult_instruction = Instruction(mul_operation, 3)
-# input_instruction = Instruction(input_operation, 1)
-input_instruction = Instruction(automated_input_operation, 1)
-# output_instruction = Instruction(output_operation, 1)
-output_instruction = Instruction(automated_output_operation, 1)
-jump_if_true_instruction = Instruction(jump_if_true_operation, 2)
-jump_if_false_instruction = Instruction(jump_if_false_operation, 2)
-less_than_instruction = Instruction(less_than_operation, 3)
-equals_instruction = Instruction(equals_operation, 3)
-adjust_base_instruction = Instruction(adjust_relative_base, 1)
-halt_instruction = Instruction(halt_operation, 0)
-
-instructions = {
-    1: add_instruction,
-    2: mult_instruction,
-    3: input_instruction,
-    4: output_instruction,
-    5: jump_if_true_instruction,
-    6: jump_if_false_instruction,
-    7: less_than_instruction,
-    8: equals_instruction,
-    9: adjust_base_instruction,
-    99: halt_instruction
-}
-
-
-IO_queue = []
-instruction_queue = []
-relative_base = [0]
-player_pos = [()]
-
 # Main
 def run_intcode_program(intcode, current_address, current_amp):
     ''' Run the intcode program ;)
@@ -590,7 +585,13 @@ def run_intcode_program(intcode, current_address, current_amp):
     return r
 
 
+# This porblem only
+def clear():
+    _ = system('cls')
+
+
 def print_board():
+    # return
     # i = open("Day_13/board.txt", 'w', encoding='utf-8')c
     clear()
     b = ''
@@ -602,11 +603,60 @@ def print_board():
     print(b)
 
 
-GREEN = "\033[0;32;40m"
-YELLOW = "\033[0;33;40m"
-BLUE = "\033[0;34;40m"
-RED = "\033[0;31;40m"
-END = "\033[0m"
+def update_board(instruction_queue):
+    for i in range(len(instruction_queue)):
+        x = instruction_queue[i][0]
+        y = instruction_queue[i][1]
+        # print('X',  x, 'Y', y, 'Tile', instruction_queue[i][2])
+        if x < 0:
+            tile = instruction_queue[i][2]
+            scored[0] = 1
+        else:
+            tile = tiles[instruction_queue[i][2]]
+            if tile == tiles[3]:
+                player_pos[0] = (x, y)
+            if tile == tiles[4]:
+                ball_pos['previous'] = ball_pos['current']
+                ball_pos['current'] = x
+        instruction_queue.clear()
+        board[x][y] = tile
+
+
+# Setup
+add_instruction = Instruction(add_operation, 3)
+mult_instruction = Instruction(mul_operation, 3)
+# input_instruction = Instruction(input_operation, 1)
+input_instruction = Instruction(ai_input_operation, 1)
+# input_instruction = Instruction(arrow_input_operation, 1)
+# output_instruction = Instruction(output_operation, 1)
+output_instruction = Instruction(automated_output_operation, 1)
+jump_if_true_instruction = Instruction(jump_if_true_operation, 2)
+jump_if_false_instruction = Instruction(jump_if_false_operation, 2)
+less_than_instruction = Instruction(less_than_operation, 3)
+equals_instruction = Instruction(equals_operation, 3)
+adjust_base_instruction = Instruction(adjust_relative_base, 1)
+halt_instruction = Instruction(halt_operation, 0)
+
+instructions = {
+    1: add_instruction,
+    2: mult_instruction,
+    3: input_instruction,
+    4: output_instruction,
+    5: jump_if_true_instruction,
+    6: jump_if_false_instruction,
+    7: less_than_instruction,
+    8: equals_instruction,
+    9: adjust_base_instruction,
+    99: halt_instruction
+}
+
+
+AI_queue = []
+instruction_queue = []
+player_pos = [()]
+ball_pos = {'previous': 0, 'current': 0}
+scored = [0]
+board = [['.' for row in range(24)] for col in range(45)]
 
 tiles = {
     0: ' ',
@@ -617,29 +667,16 @@ tiles = {
 }
 
 
-def update_board(instruction_queue):
-    for i in range(len(instruction_queue)):
-        x = instruction_queue[i][0]
-        y = instruction_queue[i][1]
-        #print('X',  x, 'Y', y, 'Tile', instruction_queue[i][2])
-        if x < 0:
-            tile = instruction_queue[i][2]
-        else:
-            tile = tiles[instruction_queue[i][2]]
-            if tile == tiles[3]:
-                player_pos[0] = (x, y)
-        instruction_queue.clear()
-        board[x][y] = tile
-
-
-intcode = []
 if __name__ == "__main__":
     with open("Day_13/Data/day-13.txt", "r") as in_file:
         intcode = format_data(in_file)
 
     program = load_program(intcode)
-    board = [['.' for row in range(24)] for col in range(45)]
     program[0] = 2
+
+    AI_queue.append(0)
+    AI_queue.append(-1)
+
     for r in run_intcode_program(program, 0, 0):
         if len(IO_queue) == 3:
             instruction_queue.append(
