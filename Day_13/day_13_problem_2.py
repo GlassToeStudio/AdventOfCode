@@ -21,7 +21,6 @@ Beat the game by breaking all the blocks. What is your score after the last
 block is broken?
 '''
 
-
 import math
 import time
 import msvcrt
