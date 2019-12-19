@@ -33,8 +33,8 @@ import math
 from os import system, name
 
 
-def clear(): 
-    _ = system('cls') 
+def clear():
+    _ = system('cls')
 
 
 class Instruction:
@@ -162,7 +162,8 @@ def get_read_param_by_mode(mode, param, codes):
         1, immediate mode. In immediate mode, a parameter is interpreted
         as a value - if the parameter is 50, its value is simply 50.
 
-        Parameters that an instruction writes to will never be in immediate mode.
+        Parameters that an instruction writes to will never be in immediate
+        mode.
 
     Args:
         mode (int): The parameter mode for the instruction
@@ -198,7 +199,8 @@ def get_write_param_by_mode(mode, param, codes):
         1, immediate mode. In immediate mode, a parameter is interpreted
         as a value - if the parameter is 50, its value is simply 50.
 
-        Parameters that an instruction writes to will never be in immediate mode.
+        Parameters that an instruction writes to will never be in immediate
+        mode.
 
     Args:
         mode (int): The parameter mode for the instruction
@@ -250,7 +252,7 @@ def load_program(intcode):
 
 
 def format_data(input):
-    return [int(x) for x in input.read().split(',')] 
+    return [int(x) for x in input.read().split(',')]
 
 
 # Operations:
@@ -508,8 +510,8 @@ def halt_operation(**kwargs):
 add_instruction = Instruction(add_operation, 3)
 mult_instruction = Instruction(mul_operation, 3)
 input_instruction = Instruction(input_operation, 1)
-#input_instruction = Instruction(automated_input_operation, 1)
-#output_instruction = Instruction(output_operation, 1)
+# input_instruction = Instruction(automated_input_operation, 1)
+# output_instruction = Instruction(output_operation, 1)
 output_instruction = Instruction(automated_output_operation, 1)
 jump_if_true_instruction = Instruction(jump_if_true_operation, 2)
 jump_if_false_instruction = Instruction(jump_if_false_operation, 2)
@@ -573,8 +575,8 @@ def print_board(board):
     for y in range(len(board)):
         for x in range(len(board[0])):
             b += board[y][x]
-        b+='\n'
-    #print(b, file=fi)
+        b += '\n'
+    # print(b, file=fi)
     print(b)
 
 
