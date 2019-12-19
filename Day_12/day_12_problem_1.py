@@ -251,9 +251,12 @@ class Moon:
             f",vel=<{self.velocity.x}, {self.velocity.y}, {self.velocity.z}>")
 
     def __update_velocity__(self, me, them):
-        if me < them: return 1
-        elif me > them: return -1
-        else: return 0
+        if me < them:
+            return 1
+        elif me > them:
+            return -1
+        else:
+            return 0
 
     def __update_kinetic_energy__(self):
         self.kinetic_energy = (
@@ -301,13 +304,9 @@ def get_output(moons):
 
 
 def get_total_energy(moons, steps):
-    get_output(moons)
-
     for i in range(steps):
         apply_gravity(moons)
         apply_velocity(moons)
-        if(i % 100 == 0):
-            get_output(moons)
 
     total = 0
     for moon in moons:
