@@ -23,9 +23,10 @@ block is broken?
 
 
 import math
-from os import system, name
-import msvcrt
 import time
+import msvcrt
+from PIL import Image
+from os import system, name
 
 GREEN = "\033[0;32;40m"
 YELLOW = "\033[0;33;40m"
@@ -326,7 +327,10 @@ def input_operation(codes, params, modes, **kwargs):
 
 # Will solvve the puzzle
 def ai_input_operation(codes, params, modes, **kwargs):
-    print_board()
+    # print_board()
+    # create_image_frame(board, pixels, 45, 24)
+    # img.save(f'Day_13/Images/game-{index[0]}.png')
+    index[0] += 1
     player_dir = 0
     if ball_pos['previous'] < ball_pos['current']:
         player_dir = 1
@@ -581,7 +585,7 @@ def run_intcode_program(intcode, current_address, current_amp):
             params,
             modes,
             current_address
-            )
+        )
         current_address += instructions[opcode].steps
         yield r
     return r
@@ -603,6 +607,22 @@ def print_board():
         b += '\n'
     # print(b, file=fi)
     print(b)
+
+
+def create_image_frame(board, pixels, width, height):
+    for y in range(len(board[0])):
+        for x in range(len(board)):
+            if board[x][y] == BLUE + '█' + END:
+                pixels[x, y] = (0, 0, 255)
+            elif board[x][y] == GREEN + '░' + END:
+                pixels[x, y] = (0, 255, 0)
+            elif board[x][y] == YELLOW + '=' + END:
+                pixels[x, y] = (255, 255, 0)
+            elif board[x][y] == RED + '©' + END:
+                pixels[x, y] = (255, 0, 0)
+            else:
+                pixels[x, y] = (0, 0, 0)
+    return pixels
 
 
 def update_board(instruction_queue):
@@ -659,6 +679,7 @@ player_pos = [()]
 ball_pos = {'previous': 0, 'current': 0}
 scored = [0]
 board = [['.' for row in range(24)] for col in range(45)]
+index = [0]
 
 tiles = {
     0: ' ',
@@ -678,6 +699,10 @@ if __name__ == "__main__":
 
     AI_queue.append(0)
     AI_queue.append(-1)
+
+    # img = Image.new('RGB', (45, 24), color='black')
+    # pixels = img.load()
+    # pixels = create_image_frame(board, pixels, 45, 24)
 
     for r in run_intcode_program(program, 0, 0):
         if len(IO_queue) == 3:
