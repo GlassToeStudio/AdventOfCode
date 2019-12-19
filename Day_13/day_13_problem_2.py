@@ -324,6 +324,7 @@ def input_operation(codes, params, modes, **kwargs):
     return 3
 
 
+# Will solvve the puzzle
 def ai_input_operation(codes, params, modes, **kwargs):
     print_board()
     player_dir = 0
@@ -341,6 +342,7 @@ def ai_input_operation(codes, params, modes, **kwargs):
     return 3
 
 
+# Playable game with arrow keys or wasd
 def arrow_input_operation(codes, params, modes, **kwargs):
     ''' Modify a value at location in the intcode program with the next
     available value in the input queue.
@@ -363,9 +365,9 @@ def arrow_input_operation(codes, params, modes, **kwargs):
     time = 10000
     player_dir = 0
     inital_pos_x = player_pos[0][0]
+
     while time > 0:
         time -= 0.5
-
         if msvcrt.kbhit():
             pressedKey = msvcrt.getch()
             if str(pressedKey) == "b'a'" or str(pressedKey) == "b'K'":
@@ -685,6 +687,6 @@ if __name__ == "__main__":
             update_board(instruction_queue)
 
     print_board()
-# Your puzzle answer was
+# Your puzzle answer was 23981
 
 '▓ ▒ ░'
