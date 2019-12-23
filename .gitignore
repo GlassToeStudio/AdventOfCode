@@ -44,3 +44,4 @@ uitests/out/**
 # tests to not leave the file behind.
 src/test/get-pip.py
 .vscode/settings.json
+test-make-gif.py
