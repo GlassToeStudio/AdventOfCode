@@ -680,13 +680,13 @@ def populate_map(Maze, x_min, x_max, y_min, y_max):
 
 
 def print_map(Map):
-    # fi = open("Day_15/Data/day-15-2.txt", 'w', encoding='utf-8')
+    fi = open("Day_15/Data/day-15-2.txt", 'w', encoding='utf-8')
     s = ''
     for row in range(len(Map) - 1, -1, -1):
         for col in range(len(Map[0])):
-            s += f"{Map[row][col]}"
+            s += f"{Map[row][col]},"
         s += '\n'
-    # print(s, file=fi)
+    print(s, file=fi)
     print(s)
 
 
