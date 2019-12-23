@@ -1,103 +1,97 @@
-''' --- Day 11: Space Police ---
-On the way to Jupiter, you're pulled over by the Space Police.
+''' --- Day 15: Oxygen System ---
+Out here in deep space, many things can go wrong. Fortunately, many of those
+things have indicator lights. Unfortunately, one of those lights is lit: the
+oxygen system for part of the ship has failed!
 
-"Attention, unmarked spacecraft! You are in violation of Space Law! All
-spacecraft must have a clearly visible registration identifier! You have 24
-hours to comply or be sent to Space Jail!"
+According to the readouts, the oxygen system must have failed days ago after a
+rupture in oxygen tank two; that section of the ship was automatically sealed
+once oxygen levels went dangerously low. A single remotely-operated repair
+droid is your only option for fixing the oxygen system.
 
-Not wanting to be sent to Space Jail, you radio back to the Elves on Earth for
-help. Although it takes almost three hours for their reply signal to reach you,
-they send instructions for how to power up the emergency hull painting robot
-and even provide a small Intcode program (your puzzle input) that will cause
-it to paint your ship appropriately.
+The Elves' care package included an Intcode program (your puzzle input) that
+you can use to remotely control the repair droid. By running that program, you
+can direct the repair droid to the oxygen system and fix the problem.
 
-There's just one problem: you don't have an emergency hull painting robot.
+The remote control program executes the following steps in a loop forever:
 
-You'll need to build a new emergency hull painting robot. The robot needs to
-be able to move around on the grid of square panels on the side of your ship,
-detect the color of its current panel, and paint its current panel black or
-white. (All of the panels are currently black.)
+Accept a movement command via an input instruction.
+Send the movement command to the repair droid.
+Wait for the repair droid to finish the movement operation.
+Report on the status of the repair droid via an output instruction.
+Only four movement commands are understood: north (1), south (2), west (3),
+and east (4). Any other command is invalid. The movements differ in direction,
+but not in distance: in a long enough east-west hallway, a series of commands
+like 4,4,4,4,3,3,3,3 would leave the repair droid back where it started.
 
-The Intcode program will serve as the brain of the robot. The program uses
-input instructions to access the robot's camera: provide 0 if the robot is
-over a black panel or 1 if the robot is over a white panel. Then, the program
-will output two values:
+The repair droid can reply with any of the following status codes:
 
---  First, it will output a value indicating the color to paint the panel the
-robot is over: 0 means to paint the panel black, and 1 means to paint the
-panel white.
-S-- econd, it will output a value indicating the direction the robot should
-turn: 0 means it should turn left 90 degrees, and 1 means it should turn right
-90 degrees.
+0: The repair droid hit a wall. Its position has not changed.
+1: The repair droid has moved one step in the requested direction.
+2: The repair droid has moved one step in the requested direction; its new
+position is the location of the oxygen system.
+You don't know anything about the area around the repair droid, but you can
+figure it out by watching the status codes.
 
-After the robot turns, it should always move forward exactly one panel. The
-robot starts facing up.
+For example, we can draw the area using D for the droid, # for walls, . for
+locations the droid can traverse, and empty space for unexplored locations.
+Then, the initial state looks like this:
 
-The robot will continue running for a while like this and halt when it is
-finished drawing. Do not restart the Intcode computer inside the robot during
-this process.
 
-For example, suppose the robot is about to start running. Drawing black panels
-as ., white panels as #, and the robot pointing the direction it is facing
-(< ^ > v), the initial state and region near the robot looks like this:
 
-    .....
-    .....
-    ..^..
-    .....
-    .....
+   D
 
-The panel under the robot (not visible here because a ^ is shown instead) is
-also black, and so any input instructions at this point should be provided 0.
-Suppose the robot eventually outputs 1 (paint white) and then 0 (turn left).
-After taking these actions and moving forward one panel, the region now looks
-like this:
 
-    .....
-    .....
-    .<#..
-    .....
-    .....
+To make the droid go north, send it 1. If it replies with 0, you know that
+location is a wall and that the droid didn't move:
 
-Input instructions should still be provided 0. Next, the robot might output 0
-(paint black) and then 0 (turn left):
 
-    .....
-    .....
-    ..#..
-    .v...
-    .....
+   #
+   D
 
-After more outputs (1,0, 1,0):
 
-    .....
-    .....
-    ..^..
-    .##..
-    .....
+To move east, send 4; a reply of 1 means the movement was successful:
 
-The robot is now back where it started, but because it is now on a white panel,
-input instructions should be provided 1. After several more outputs
-(0,1, 1,0, 1,0), the area looks like this:
 
-    .....
-    ..<#.
-    ...#.
-    .##..
-    .....
+   #
+   .D
 
-Before you deploy the robot, you should probably have an estimate of the area
-it will cover: specifically, you need to know the number of panels it paints
-at least once, regardless of color. In the example above, the robot painted 6
-panels at least once. (It painted its starting panel twice, but that panel is
-still only counted once; it also never painted the panel it ended on.)
 
-Build a new emergency hull painting robot and run the Intcode program on it.
-How many panels does it paint at least once?
+Then, perhaps attempts to move north (1), south (2), and east (4) are all met
+with replies of 0:
+
+
+   ##
+   .D#
+    #
+
+Now, you know the repair droid is in a dead end. Backtrack with 3 (which you
+already know will get a reply of 1 because you already know that location is
+open):
+
+
+   ##
+   D.#
+    #
+
+
+Then, perhaps west (3) gets a reply of 0, south (2) gets a reply of 1, south
+again (2) gets a reply of 0, and then west (3) gets a reply of 2:
+
+
+   ##
+  #..#
+  D.#
+   #
+
+Now, because of the reply of 2, you know you've found the oxygen system! In
+this example, it was only 2 moves away from the repair droid's starting
+position.
+
+What is the fewest number of movement commands required to move the repair
+droid from its starting position to the location of the oxygen system?
 '''
 
 import math
-from PIL import Image
 from os import system
 
 GREEN = "\033[0;32;40m"
@@ -302,22 +296,6 @@ def check_valid_location(codes, param):
         codes[param] = 0
 
 
-def get_copy_of_program(intcode):
-    ''' Return a copy of the intcode.
-
-    Args:
-        intcode (int[]): The intcode program
-
-    Returns:
-        int[]: copy of intcode
-    '''
-
-    program = []
-    for i in intcode:
-        program.append(i)
-    return program
-
-
 def load_program(intcode):
     program = {}
     for i in range(len(intcode)):
@@ -327,52 +305,6 @@ def load_program(intcode):
 
 def format_data(input):
     return [int(x) for x in input.read().split(',')]
-
-
-def _format_data(paint_map):
-    xmax = max(x for w, x, y, z in paint_map.values())
-    xmin = min(x for w, x, y, z in paint_map.values())
-    ymax = max(y for w, x, y, z in paint_map.values())
-    ymin = min(y for w, x, y, z in paint_map.values())
-    width = xmax - xmin + 1
-    height = ymax - ymin + 1
-    data = [[0 for _ in range(height)] for _ in range(width)]
-    k = 0
-    m = 0
-    for j in range(ymax, ymin - 1, -1):
-        for i in range(xmin, xmax):
-            if (i, j) in paint_map:
-                data[k][m] = paint_map[(i, j)][3]
-            else:
-                data[k][m] = 0
-            k += 1
-        m += 1
-        k = 0
-    return data, width, height
-
-
-def create_answer_text(data_input, width, height):
-    answer = ''
-    for row in range(height):
-        for col in range(width):
-            if data_input[col][row] == 1:
-                answer = f"{answer}█"
-            else:
-                answer = f"{answer} "
-        answer = f"{answer}\n"
-    with open("Day_11/day-11-part-1.txt", "w", encoding='utf-8') as pass_file:
-        pass_file.write(answer)
-    print(answer)
-
-
-def create_answer_image(data_input, p, width, height):
-    for col in range(height):
-        for row in range(width):
-            if data_input[row][col] == 1:
-                p[row, col] = (255, 255, 255)
-            elif data_input[row][col] == 0:
-                p[row, col] = (0, 0, 0)
-    return p
 
 
 # Operations:
@@ -725,37 +657,127 @@ def turn_left(direction):
         return 4
 
 
-def print_map(Maze, x_min, x_max, y_min, y_max, tile_offset):
+def populate_map(Maze, x_min, x_max, y_min, y_max):
     clear()
     x_offset = abs(x_min)
     y_offset = abs(y_min)
     x_max += x_offset + 1
     y_max += y_offset + 1
-    Map = [['░' for col in range(x_max)] for row in range(y_max)]
 
-    Maze[(0, 0)] = tiles[3 + tile_offset]
+    Map = [[0 for col in range(x_max)] for row in range(y_max)]
+    Maze[(0, 0)] = 3
     if not oxygen_location[0] is None:
-        Maze[oxygen_location[0]] = tiles[2 + tile_offset]
+        Maze[oxygen_location[0]] = 2
 
     for k in Maze:
         x, y = k
         x += x_offset
         y += y_offset
-        Map[y][x] = Maze[k][0]
+        Map[y][x] = Maze[k]
 
+    print_map(Map)
+    return Map
+
+
+def print_map(Map):
+    # fi = open("Day_15/Data/day-15-2.txt", 'w', encoding='utf-8')
     s = ''
-    for row in range(len(Map)):
+    for row in range(len(Map) - 1, -1, -1):
         for col in range(len(Map[0])):
             s += f"{Map[row][col]}"
         s += '\n'
+    # print(s, file=fi)
     print(s)
 
 
-Start = RED + '⬤' + END,
-Wall = '░',
-Success = ' ',
-Oxygen = BLUE + '⬤' + END,
-Me = GREEN + '⬤' + END,
+def run_robot(intcode):
+    i = 0
+    track_i = True
+    x_min = 0
+    x_max = 0
+    y_min = 0
+    y_max = 0
+    Maze = {}
+    current_direction = 4
+    location = (0, 0)
+    start_location = (0, 0)
+    Maze[location] = 3
+    IO_queue.append(4)
+    program = load_program(intcode)
+
+    for r in run_intcode_program(program, 0, 0):
+        if r == 4 and len(IO_queue) > 0:
+            result = IO_queue.pop()
+
+            if result == 0:
+                x, y = location
+                cx, cy = directions[current_direction]
+                Maze[location] = 4
+
+                x_min, x_max, y_min, y_max = check_min_max(
+                    (x + cx, y + cy),
+                    x_min,
+                    x_max,
+                    y_min,
+                    y_max)
+
+                if (x + cx, y + cy) != oxygen_location[0]:
+                    Maze[(x + cx, y + cy)] = 0
+
+                current_direction = turn_left(current_direction)
+                IO_queue.append(current_direction)
+
+            elif result == 1:
+                x, y = location
+                Maze[location] = 1
+                cx, cy = directions[current_direction]
+                location = (x + cx, y + cy)
+                if location not in Maze and track_i:
+                    i += 1
+                elif track_i:
+                    i -= 1
+                if location == start_location:
+                    return Maze, x_min, x_max, y_min, y_max, i
+                x_min, x_max, y_min, y_max = check_min_max(
+                    location,
+                    x_min,
+                    x_max,
+                    y_min,
+                    y_max)
+                if (x + cx, y + cy) != oxygen_location[0]:
+                    Maze[location] = 4
+
+                current_direction = turn_right(current_direction)
+                IO_queue.append(current_direction)
+
+            elif result == 2:
+                i += 1
+                track_i = False
+                x, y = location
+                cx, cy = directions[current_direction]
+
+                location = (x + cx, y + cy)
+                oxygen_location[0] = (x + cx, y + cy)
+
+                x_min, x_max, y_min, y_max = check_min_max(
+                    location,
+                    x_min,
+                    x_max,
+                    y_min, y_max)
+
+                Maze[location] = 2
+                current_direction = turn_right(current_direction)
+
+                IO_queue.append(current_direction)
+        pass
+    return Maze, x_min, x_max, y_min, y_max, i
+
+
+Start = RED + '⬤ ' + END,
+Wall = '░░',
+Success = '  ',
+Oxygen = BLUE + '⬤ ' + END,
+Me = GREEN + '⬤ ' + END,
 
 tiles = {
     0: Wall,
@@ -763,11 +785,6 @@ tiles = {
     2: Oxygen,
     3: Start,
     4: Me,
-    10: '0',
-    11: '1',
-    12: '2',
-    13: '3',
-    14: '4'
 }
 
 North = (0, 1)
@@ -784,103 +801,11 @@ directions = {
 
 oxygen_location = [None]
 
-
-def run_robot(intcode, tile_offset):
-    i = 0
-    x_min = 0
-    x_max = 0
-    y_min = 0
-    y_max = 0
-    Maze = {}
-    current_direction = 4
-    location = (0, 0)
-    start_location = (0, 0)
-    Maze[location] = tiles[3]
-    IO_queue.append(4)
-    program = load_program(intcode)
-
-    for r in run_intcode_program(program, 0, 0):
-        if r == 4 and len(IO_queue) > 0:
-            result = IO_queue.pop()
-
-            if result == 0:
-                x, y = location
-                cx, cy = directions[current_direction]
-                Maze[location] = tiles[4 + tile_offset]
-
-                x_min, x_max, y_min, y_max = check_min_max(
-                    (x + cx, y + cy),
-                    x_min,
-                    x_max,
-                    y_min,
-                    y_max)
-
-                if (x + cx, y + cy) != oxygen_location[0]:
-                    Maze[(x + cx, y + cy)] = tiles[0 + tile_offset]
-
-                current_direction = turn_left(current_direction)
-                IO_queue.append(current_direction)
-
-            elif result == 1:
-                x, y = location
-                Maze[location] = tiles[1 + tile_offset]
-                cx, cy = directions[current_direction]
-                location = (x + cx, y + cy)
-                if location not in Maze:
-                    i += 1
-                else:
-                    i -= 1
-                if location == start_location:
-                    return Maze, x_min, x_max, y_min, y_max
-                x_min, x_max, y_min, y_max = check_min_max(
-                    location,
-                    x_min,
-                    x_max,
-                    y_min,
-                    y_max)
-                if (x + cx, y + cy) != oxygen_location[0]:
-                    Maze[location] = tiles[4 + tile_offset]
-
-                current_direction = turn_right(current_direction)
-                IO_queue.append(current_direction)
-
-            elif result == 2:
-                i += 1
-                x, y = location
-                cx, cy = directions[current_direction]
-
-                location = (x + cx, y + cy)
-                oxygen_location[0] = (x + cx, y + cy)
-
-                x_min, x_max, y_min, y_max = check_min_max(
-                    location,
-                    x_min,
-                    x_max,
-                    y_min, y_max)
-
-                Maze[location] = tiles[2 + tile_offset]
-                current_direction = turn_right(current_direction)
-
-                return Maze, x_min, x_max, y_min, y_max, i
-                IO_queue.append(current_direction)
-            # print_map(Maze, x_min, x_max, y_min, y_max, tile_offset)
-        pass
-    return Maze, x_min, x_max, y_min, y_max
-
-
 if __name__ == "__main__":
     with open("Day_15/Data/day-15.txt", "r") as in_file:
         intcode = format_data(in_file)
 
-    tile_offset = 0
-    Maze, x_min, x_max, y_min, y_max, i = run_robot(intcode, tile_offset)
-    # print_map(Maze, x_min, x_max, y_min, y_max, tile_offset)
-    # print(x_min, x_max, y_min, y_max)
-    # data, width, height = format_data(paint_map)
-    # img = Image.new('RGB', (width, height), color='white')
-    # pixels = img.load()
-    # pixels = create_answer_image(data, pixels, width, height)
-    # create_answer_text(data, width, height)
-    # img.save('Day_11/day-11-part-1.png')
+    Maze, x_min, x_max, y_min, y_max, i = run_robot(intcode)
+    Map = populate_map(Maze, x_min, x_max, y_min, y_max)
     print(f"The fewest number of movement commands is {i}")
 # Your puzzle answer was 318
