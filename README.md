@@ -3,7 +3,7 @@ Advent of Code 2019 https://adventofcode.com/2019
 
 ## Day 1
 
-<details><summary><b>Potential Spoilers</b></summary>
+<details><summary><b> The Tyranny of the Rocket Equation</b></summary>
 <p>
 Day 1 is a rather simple problem; calculate the fuel required to cary x amount of mass. You are given an array of masses and an equation to calculate the fuel required based a given mass.
 ```py
@@ -22,7 +22,7 @@ Loop through the array to calcualate the fuel required, and send that result bac
 
 ## Day 2
 
-<details><summary><b>Potential Spoilers</b></summary>
+<details><summary><b>1202 Program Alarm </b></summary>
 <p>
 Day 2 starts on the beggining of a much larger program; an intcode computer. The fist attempt at this computer is rather crude, and not very modular or versitile. It calculates the disired result, but not much else. 
 
@@ -38,7 +38,7 @@ Much alteration happened to create a brute force method to solve this problem.
 
 ## Day 3
 
-<details><summary><b>Potential Spoilers</b></summary>
+<details><summary><b>Crossed Wires</b></summary>
 <p>
 Day 3 provides two wire routings and you must find the intersctiion of wires closest to the origin. I thought creating an image of the the wire diagram was a neat idea, so the code is littered with image manipulation along with the logic...  ¯\\_(ツ)_/¯
 
@@ -52,7 +52,7 @@ Crewating a map of all intersections, with their wire routes distance made it qu
 
 ## Day 4
 
-<details><summary><b>Potential Spoilers</b></summary>
+<details><summary><b>Secure Container</b></summary>
 <p>
 Cracking a password.. or at least finding the possible solutions in a given range. 
 
@@ -65,7 +65,7 @@ Part 2: Same problem but a few new rules, or modifications to the older rules. P
 
 ## Day 5
 
-<details><summary><b>Potential Spoilers</b></summary>
+<details><summary><b>Sunny with a Chance of Asteroids</b></summary>
 <p>
 **The intcode computer is back.**
 
@@ -84,9 +84,87 @@ Part 2: No problemo, adding operations to the intcode computer is a breeze. Four
 
 ## Day 6
 
-<details><summary><b>Potential Spoilers</b></summary>
+<details><summary><b>Universal Orbit Map</b></summary>
 <p>
-tbd
+Part 1: something something graph, something something search, something something count nodes.
+
+Part 2: Traverse graph from x to y, count steps. 
+
+:P
+
+*Should clarify soon*™
 </p>
 </details>
 
+## Day 7
+
+<details><summary><b>Amplification Circuit</b></summary>
+<p>
+Part 1: More intcode, my computer works great! But how it needs to know its own state, and we must run five of them in a sequence, with each prgram output being feed to the next's input. Making the a psuedo yeild opertion, and tracking instruction pointer for each computer helped solve this problem. Get the final output after feeding IO in a sequence, once. 
+
+Part 2: Same as part one, but continuing in a loop intil a halt operation is reached, more tricky than the first part, but doable. I'll realize later that there is an easier way.. although I have yet to make the computer its own class where I can create instances... should have already but meh.
+
+</p>
+</details>
+
+## Day 8
+
+<details><summary><b>Space Image Format</b></summary>
+<p>
+Part 1: Another password. But the elves took a picture this time. The picture is encoded and sent, but we must first verify that the data isnt corrupted. Must find the image layer with the fewest 0 digits. And on that layer, multiply the nuber of 1 digits by the number of 2 dgits. Easy enough, count 0 on every layer, count 1 and 2 on that layer, return the product. 
+
+Part 2: Simply place layer upon layer and read the result. I made a .png.
+
+<p align="center">
+<img src="https://github.com/GlassToeStudio/AdventOfCode/blob/master/Day_08/day-8-password.png" width="20%" height="20%"
+</p>
+
+</p>
+</details>
+
+## Day 9
+
+<details><summary><b>Sensor Boost</b></summary>
+<p>
+Part 1: More intocde computer changes, add relative mode for instruction pointer. Add ability to 'load into memory' aka the available location for a memeory address can be outside the length of the given intcode. Easy enough to implement. 
+Run the program, it outputs a code. 
+
+Part 2:Just provide a new input, read the output. 
+
+</p>
+</details>
+
+## Day 10
+
+<details><summary><b>Monitoring Station</b></summary>
+<p>
+Part 1:
+<p align="center">
+<img src="https://github.com/GlassToeStudio/AdventOfCode/blob/master/Day_10/asteroid-map-scanning.gif" width="50%" height="50%">
+</p>
+
+Part 2:
+Solved in python, eventually, but solved in c# in Unity first!
+https://github.com/GlassToeStudio/Advent-of-Code-Day-10
+
+</p>
+</details>
+
+## Day 11
+
+<details><summary><b>Space Police</b></summary>
+<p>
+Part 1:
+<p align="center">
+<img src="https://github.com/GlassToeStudio/AdventOfCode/blob/master/Day_11/day-11-part-1.png" width="50%" height="50%">
+</p>
+
+
+Part 2:
+<p align="center">
+<img src="https://github.com/GlassToeStudio/AdventOfCode/blob/master/Day_11/day-11-password.png" width="50%" height="50%">
+</p>
+
+
+</p>
+</details>
