@@ -114,7 +114,7 @@ def run_robot(intcode):
     Maze = []
     temp = []
     computer = Int_Computer(intcode, output_to_queue=True)
-    for _ in computer.run_intcode_program():
+    for _ in computer.run():
         if len(computer.IO_queue) > 0:
             t = computer.IO_queue.pop()
             if t != 10:

@@ -81,6 +81,12 @@ def format_data(data):
     return [int(x) for x in data.read().split(',')]
 
 
+def string_to_ASCII(ins):
+    ''' why not :D '''
+    r = [ord(x) for x in ins]   
+    return r
+
+
 def run_robot(intcode):
     dust = 0
     pc = Int_Computer(intcode, output_to_queue=True, input_from_queue=True)
@@ -91,7 +97,7 @@ def run_robot(intcode):
     pc.IO_queue.extend(stream_video)
     pc.IO_queue.reverse()
 
-    for r in pc.run_intcode_program():
+    for r in pc.run():
         if r == 4:
             if len(pc.IO_queue) > 0:
                 t = pc.IO_queue.pop()
@@ -100,16 +106,13 @@ def run_robot(intcode):
 
     return dust
 
-# A,B,A,B,C,C,B,C,B,A
-main_routine = [65,44,66,44,65,44,66,44,67,44,67,44,66,44,67,44,66,44,65,10]
-# R12,L8,R12
-A = [82,44,49,50,44,76,44,56,44,82,44,49,50,10]
-# R8,R6,R6,R8
-B = [82,44,56,44,82,44,54,44,82,44,54,44,82,44,56,10]
-# R8,L8,R8,R4,R4
-C = [82,44,56,44,76,44,56,44,82,44,56,44,82,44,52,44,82,44,52,10]
-# 121 for y, 110 for n
-stream_video = [110,10]
+
+# calculated manually
+main_routine = string_to_ASCII('A,B,A,B,C,C,B,C,B,A\n')
+A = string_to_ASCII('R,12,L,8,R,12\n')
+B = string_to_ASCII('R,8,R,6,R,6,R,8\n')
+C = string_to_ASCII('R,8,L,8,R,8,R,4,R,4\n')
+stream_video = string_to_ASCII('n\n')
 
 if __name__ == "__main__":
     with open("Day_17/Data/day-17.txt", "r") as in_file:
